@@ -1,0 +1,422 @@
+---
+title: "Capítulo 2. Introducción a Machine Learning"
+subtitle: "*Machine Learning - MII - UNAB*"
+author: "Marcelo Alid-Vaccarezza"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    toc_depth: 3
+    fig_caption: true
+    number_sections: false
+    code_download: false
+    df_print: paged
+---
+
+<div style="text-align: justify">
+
+<br>
+
+<br>
+
+<!-- ```{r setup, include = FALSE} -->
+
+<!-- knitr::opts_chunk$set(warning = FALSE, echo = FALSE) -->
+
+<!-- knitr::opts_chunk$set(warning = FALSE) -->
+
+<!-- ``` -->
+
+------------------------------------------------------------------------
+
+> En este capítulo aprenderás sobre:
+>
+> -   Los orígenes y aplicaciones prácticas del aprendizaje automático.
+> -   Cómo las computadoras convierten los datos en conocimiento y acción.
+> -   Cómo hacer coincidir un algoritmo de aprendizaje automático con sus datos.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+<center>
+
+Afortunadamente, las máquinas aún requieren la participación del ser humano.
+
+</center>
+:::
+
+<br>
+
+## 2.1. Los Orígenes del Aprendizaje Automático
+
+Desde que nacemos, estamos inundados de datos. Los sensores de nuestro cuerpo, los ojos, los oídos, la nariz, la lengua y los nervios, son continuamente atacados con datos en bruto que nuestro cerebro traduce en imágenes, sonidos, olores, sabores y texturas.
+
+-   Usando el lenguaje, podemos compartir estas experiencias con otros.
+
+-   Desde la llegada del lenguaje escrito, se han registrado observaciones humanas.
+
+-   Hoy en día, estas observaciones, y muchas más, están cada vez más automatizadas y registradas sistemáticamente en las bases de datos computarizadas en constante crecimiento.
+
+-   La invención de sensores electrónicos también ha contribuido a una explosión en el volumen y la riqueza de los datos registrados.
+
+-   Aunque los sensores no necesariamente informan una descripción única y definitiva de la realidad. Algunos tienen un error de medición inherente debido a limitaciones de hardware. Otros están limitados por su alcance.
+
+Este diluvio de datos ha llevado a algunos a afirmar que hemos entrado en una era de **Big Data**.
+
+El campo de estudio interesado en el desarrollo de algoritmos informáticos para transformar datos en acciones inteligentes se conoce como **Aprendizaje Automático**.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_1_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
+
+Un pariente estrechamente relacionado del aprendizaje automático, **Data Mining**, se preocupa por la generación de conocimientos novedosos a partir de grandes bases de datos.
+
+Pero un punto potencial de distinción es que el aprendizaje automático se enfoca en enseñar a las computadoras cómo usar datos para resolver un problema, mientras que la minería de datos se enfoca en enseñar a las computadoras a identificar patrones que los humanos luego usan para resolver un problema.
+
+<br>
+
+## 2.2. Usos y Abusos del Aprendizaje Automático
+
+Algunos han especulado que la inteligencia informática reemplazará a los humanos en muchas ocupaciones de tecnología de la información, al igual que las máquinas reemplazaron a los humanos en los campos y los robots reemplazaron a los humanos en la línea de ensamblaje.
+
+La verdad es que incluso cuando las máquinas alcanzan hitos tan impresionantes, todavía están relativamente limitadas en su capacidad para comprender a fondo un problema. Son pura potencia intelectual sin dirección. **Las computadoras aún necesitan un ser humano para motivar el análisis y convertir el resultado en una acción significativa**.
+
+Las máquinas no son buenas para hacer preguntas, o incluso para saber qué preguntas hacer. Son mucho mejores para responderlas, siempre que la pregunta se formule de una manera que la computadora pueda comprender.
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+El sentido del olfato del perro puede ser muchas veces más fuerte que el de su amo, pero sin ser dirigido con cuidado, el perro puede terminar persiguiéndole la cola.
+:::
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_2_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
+
+## 2.3. Éxitos del Aprendizaje Automático
+
+El aprendizaje automático tiene más éxito cuando aumenta, en lugar de reemplazar, el conocimiento especializado de un experto en la materia. Algunas aplicaciones importantes son las siguientes:
+
+-   Identificación de mensajes de spam no deseados en el correo electrónico.
+
+-   Segmentación del comportamiento del cliente para publicidad dirigida.
+
+-   Previsiones de comportamiento meteorológico y cambios climáticos a largo plazo.
+
+-   Reducción de transacciones fraudulentas con tarjetas de crédito.
+
+-   Estimaciones actuariales del daño financiero de tormentas y desastres naturales.
+
+-   Predicción de resultados de elecciones populares.
+
+-   Desarrollo de algoritmos para drones de pilotaje automático y coches autónomos.
+
+-   Optimización del uso de energía en viviendas y edificios de oficinas.
+
+-   Proyección de áreas donde la actividad delictiva es más probable.
+
+-   Descubrimiento de secuencias genéticas vinculadas a enfermedades.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_3_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
+
+## 2.4. Los límites del Aprendizaje Automático
+
+Aunque el aprendizaje automático se utiliza ampliamente y tiene un enorme potencial, es importante comprender sus límites.
+
+En este momento, el aprendizaje automático no es de ninguna manera un sustituto del cerebro humano. Tiene muy poca flexibilidad para extrapolar fuera de los parámetros estrictos que aprendió y no tiene sentido común.
+
+Además, las computadoras tienen una capacidad limitada para hacer inferencias simples de sentido común sobre los próximos pasos lógicos.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_4_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
+
+Algunos de estos errores son de esperar, seguro. Estos tipos de fallas en las máquinas ilustran el hecho importante de que el aprendizaje automático es tan bueno como los datos de los que aprende.
+
+<br>
+
+## 2.5. Ética del Aprendizaje Automático
+
+Como cualquier herramienta, puede usarse para bien o para mal.
+
+Debido a la relativa juventud del aprendizaje automático como disciplina y la velocidad a la que progresa, los problemas legales y las normas sociales asociados son a menudo bastante inciertos y en constante cambio.
+
+Se debe tener precaución al obtener o analizar datos para evitar violar las leyes, violar los términos de servicio o los acuerdos de uso de datos y abusar de la confianza o violar la privacidad de los clientes o del público.
+
+Se debe aplicar el sentido común antes de aplicar ciegamente los resultados de un análisis de aprendizaje automático. Esto es particularmente cierto en los casos en que se trata de información sensible, como los datos de salud.
+
+Ciertas jurisdicciones pueden impedirle el uso de datos raciales, étnicos, religiosos o de otra clase protegida por motivos comerciales.
+
+Aparte de las consecuencias legales, el uso inadecuado de los datos puede dañar los resultados.
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+El hecho de que pueda utilizar datos para un fin en particular no siempre significa que deba hacerlo.
+:::
+
+<br>
+
+## 2.6. Cómo Aprenden las Máquinas?
+
+Si bien los cerebros humanos son naturalmente capaces de aprender desde el nacimiento, las condiciones necesarias para que las computadoras aprendan deben ser explícitas.
+
+El proceso de aprendizaje básico se puede dividir en cuatro componentes interrelacionados:
+
+1.  **El almacenamiento de datos** utiliza la observación, la memoria y la recuperación para proporcionar una base fáctica para un razonamiento adicional.
+
+2.  **Abstracción** implica la traducción de datos almacenados en representaciones y conceptos más amplios.
+
+3.  **Generalización** utiliza datos resumidos para crear conocimientos e inferencias que impulsan la acción en nuevos contextos.
+
+4.  **Evaluación** proporciona un mecanismo de retroalimentación para medir la utilidad del conocimiento aprendido e informar mejoras potenciales.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_5_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
+
+### 2.6.1. Almacenamiento de Datos
+
+Todo aprendizaje debe comenzar con datos. Pero la capacidad de almacenar y recuperar datos por sí sola no es suficiente para aprender.
+
+Sin un nivel superior de comprensión, el conocimiento se limita exclusivamente a recordar, es decir, exclusivamente lo que se ve antes y nada más.
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+Memorizar respuestas a todas las preguntas que se puedan plantear, obviamente es una estrategia insostenible.
+:::
+
+<br>
+
+Un mejor enfoque es dedicar tiempo de forma selectiva, memorizando un pequeño conjunto de ideas representativas mientras se desarrollan estrategias sobre cómo se relacionan las ideas y cómo utilizar la información almacenada. De esta forma, las grandes ideas pueden entenderse sin necesidad de memorizarlas de memoria.
+
+### 2.6.2. Abstracción
+
+Es el proceso de asignar significado a los datos almacenados. En otras palabras, **está haciendo una conexión entre un objeto y su representación**.
+
+El concepto clave aquí es **representación del conocimiento**: la formación de estructuras lógicas que ayudan a convertir la información sensorial en bruto en una percepción significativa. Representa una idea mayor que la suma de sus partes.
+
+Durante el proceso de representación del conocimiento de una máquina, la computadora resume los datos sin procesar almacenados usando un modelo, una descripción explícita de los patrones dentro de los datos.
+
+Hay muchos tipos diferentes de modelos. Algunos ejemplos son:
+
+-   Ecuaciones matemáticas.
+
+-   Diagramas relacionales como árboles y gráficos.
+
+-   Reglas lógicas *if*-*else*.
+
+-   Agrupaciones de datos conocidas como clústeres.
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+La elección del modelo normalmente no se deja en manos de la máquina. En cambio, la tarea de aprendizaje y los datos disponibles definen el modelo a utilizar.
+:::
+
+<br>
+
+El proceso de ajustar un modelo a un conjunto de datos se conoce como **entrenamiento**. Una vez entrenado el modelo, los datos se transforman en una forma abstracta que resume la información original.
+
+Es importante tener en cuenta que un modelo aprendido no proporciona por sí mismo nuevos datos, sin embargo, da lugar a nuevos conocimientos. En otras palabras, imponer una estructura asumida a los datos subyacentes da una idea de lo invisible al suponer un concepto sobre cómo se relacionan los elementos de los datos.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_6_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+Un modelo puede resultar en el descubrimiento de relaciones entre datos nunca antes vistas.
+:::
+
+<br>
+
+### 2.6.3. Generalización
+
+El proceso de aprendizaje no está completo hasta que el alumno sea capaz de utilizar su conocimiento resumido para acciones futuras.
+
+El término **generalización** describe el proceso de convertir el conocimiento abstraído en una forma que pueda utilizarse para acciones futuras, en tareas que son similares, pero no idénticas, a las que ha visto antes.
+
+Las heurísticas empleadas por los algoritmos de aprendizaje automático también a veces dan lugar a conclusiones erróneas. Se dice que el algoritmo tiene un **sesgo** si las conclusiones son sistemáticamente erróneas o incorrectas de una manera predecible.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_7_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+Paradójicamente, el sesgo es lo que nos ciega de cierta información y al mismo tiempo nos permite utilizar otra información para la acción.
+:::
+
+<br>
+
+### 2.6.4. Evaluación
+
+Cada alumno tiene sus debilidades y no existe un algoritmo de aprendizaje único para gobernarlas todas.
+
+Por lo tanto, el paso final en el proceso de generalización es evaluar o medir el éxito del alumno a pesar de sus sesgos y utilizar esta información para informar la capacitación adicional si es necesario.
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+Una vez que haya tenido éxito con una técnica de aprendizaje automático, es posible que sienta la tentación de aplicarla a todo. Es importante resistir esta tentación porque ningún enfoque de aprendizaje automático es el mejor para cada circunstancia. Este hecho se describe en el [**Teorema No Free Lunch**](https://en.wikipedia.org/wiki/No_free_lunch_theorem), introducido por David Wolpert en 1996.
+:::
+
+<br>
+
+Generalmente, la evaluación ocurre después de que un modelo ha sido entrenado en un conjunto de datos de entrenamiento inicial. Luego, el modelo se evalúa en un nuevo conjunto de datos de prueba para juzgar qué tan bien se generaliza su caracterización de los datos de entrenamiento a datos nuevos no vistos.
+
+En algunas partes, los modelos no logran generalizar perfectamente debido al problema del ruido, un término que describe variaciones inexplicables o inexplicables en los datos. Los datos ruidosos son causados por eventos aparentemente aleatorios, como:
+
+-   Error de medición debido a sensores imprecisos que a veces suman o restan un poco de las lecturas.
+
+-   Problemas con sujetos humanos, como los encuestados que informan respuestas aleatorias a las preguntas de la encuesta, para terminar más rápidamente.
+
+-   Problemas de calidad de los datos, incluidos valores perdidos, nulos, truncados, codificados incorrectamente o dañados.
+
+-   Fenómenos que son tan complejos o tan poco comprendidos que afectan los datos de formas que parecen no ser sistemáticas.
+
+Tratar de modelar el ruido es la base de un problema llamado **sobreajuste**.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_8_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
+
+## 2.7. Aprendizaje Automático en la Práctica
+
+Para aplicar el proceso de aprendizaje a tareas del mundo real, usaremos un proceso de cinco pasos.
+
+1.  **Recopilación de datos**: recopilación del material de aprendizaje que utilizará un algoritmo para generar conocimiento procesable. En la mayoría de los casos, los datos deberán combinarse en una sola fuente, como un archivo de texto, una hoja de cálculo o una base de datos.
+
+2.  **Exploración y preparación de datos**: La calidad de cualquier proyecto de aprendizaje automático se basa en gran medida en la calidad de sus datos de entrada. Por lo tanto, es importante aprender más sobre los datos y sus matices durante una práctica llamada exploración de datos. Se requiere trabajo adicional para preparar los datos para el proceso de aprendizaje. Esto implica arreglar o limpiar los llamados datos "desordenados", eliminar datos innecesarios y volver a codificar los datos para que se ajusten a las entradas esperadas por el alumno.
+
+3.  **Entrenamiento del modelo**: La tarea específica de aprendizaje automático elegida informará la selección de un algoritmo apropiado, y el algoritmo representará los datos en forma de modelo.
+
+4.  **Evaluación del modelo**: Debido a que cada modelo de aprendizaje automático da como resultado una solución sesgada al problema de aprendizaje, es importante evaluar qué tan bien aprende el algoritmo de su experiencia. Evalúe la precisión del modelo utilizando un conjunto de datos de prueba o puede que necesite desarrollar medidas de rendimiento específicas para la aplicación prevista.
+
+5.  **Mejora del modelo**: Si se necesita un mejor rendimiento, es necesario utilizar estrategias más avanzadas para aumentar el rendimiento del modelo. A veces, puede ser necesario cambiar por completo a un tipo de modelo diferente. Es posible que deba complementar sus datos con datos adicionales o realizar un trabajo preparatorio adicional como en el paso dos de este proceso.
+
+Una vez completados estos pasos, si el modelo parece estar funcionando bien, se puede implementar para la tarea prevista.
+
+<br>
+
+## 2.8. Tipos de Datos de Entrada
+
+Es importante comprender la terminología que distingue entre conjuntos de datos de entrada.
+
+**Unidad de observación** se utiliza para describir la entidad más pequeña con propiedades medidas de interés para un estudio. Por lo general, la unidad de observación está en forma de personas, objetos o cosas, transacciones, puntos temporales, regiones geográficas o medidas.
+
+Los conjuntos de datos que almacenan las unidades de observación y sus propiedades se pueden imaginar como colecciones de datos que consisten en:
+
+-   **Observaciones**: Instancias de la unidad de observación para las que se han registrado propiedades.
+
+-   **Atributos**: Propiedades registradas en cada observación que pueden ser útiles para el aprendizaje.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_9_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="550"}
+
+</center>
+
+<br>
+
+Las características también vienen en varias formas. Si una característica representa una característica medida en números, no es de extrañar que se la llame **numérica**. Alternativamente, si una característica es un atributo que consta de un conjunto de categorías, la característica se llama **categórica o nominal**. Un caso especial de variables categóricas se llama **ordinal**, que designa una variable nominal con categorías que caen en una lista ordenada.
+
+<br>
+
+## 2.9. Tipos de Algoritmos de Aprendizaje Automático
+
+Los algoritmos de aprendizaje automático se dividen en categorías según su propósito.
+
+Un modelo predictivo se usa para tareas que involucran, como su nombre lo indica, la predicción de un valor usando otros valores en el conjunto de datos. El algoritmo de aprendizaje intenta descubrir y modelar la relación entre la característica de destino (la característica que se predice) y las otras características.
+
+1.  **Aprendizaje supervisado**: los modelos reciben instrucciones claras sobre lo que necesitan aprender y cómo se pretende que lo aprendan.
+
+2.  **Aprendizaje supervisado - Clasificación**: predice a qué categoría pertenece un ejemplo. En la clasificación, la característica objetivo a predecir es una característica categórica conocida como *clase*, y se divide en categorías llamadas *niveles*. Una clase puede tener dos o más niveles, y los niveles pueden ser ordinales o no.
+
+3.  **Aprendizaje supervisado - Regresión**: predice valores numéricos, una forma común de predicción numérica. Son ampliamente utilizados para la predicción, ya que cuantifican en términos exactos la asociación entre los insumos y el objetivo, incluyendo tanto la magnitud como la incertidumbre de la relación.
+
+4.  **Aprendizaje no supervisado - Relaciones**: no hay un objetivo para aprender, por lo que ninguna característica es más importante que otra. La idea principal es describir las relaciones en los datos a través de un descubrimiento de patrones.
+
+5.  **Aprendizaje no supervisado - Agrupación**: dividir un conjunto de datos en grupos homogéneos.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_10_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
+
+## 2.10. Hacer coincidir los datos de entrada con los algoritmos
+
+Para comenzar a aplicar el aprendizaje automático a un proyecto del mundo real, deberá determinar cuál de las cuatro tareas de aprendizaje representa su proyecto: clasificación, predicción numérica, detección de relaciones o agrupación. La tarea impulsará la elección del algoritmo.
+
+<br>
+
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_11_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+
+</center>
+
+<br>
