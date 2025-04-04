@@ -1,0 +1,1106 @@
+---
+title: "Capítulo 6. Aprendizaje Supervisado: Naïve Bayes y Árboles de decisión"
+subtitle: "*Machine Learning - MII - UNAB*"
+author: "Marcelo Alid-Vaccarezza"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    toc_depth: 3
+    fig_caption: true
+    number_sections: false
+    code_download: false
+    df_print: paged
+---
+
+<div style="text-align: justify">
+
+<br>
+
+<br>
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(warning = FALSE, echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+```{r , include = FALSE}
+# load(file = "CAP6_Global_Environment.RData")
+library(magrittr)
+```
+
+
+------------------------------------------------------------------------
+
+> **En este capítulo aprenderás sobre:**
+>
+> 1.  El aprendizaje supervisado y los tipos de tareas que se pueden abordar con este tipo de aprendizaje automático.
+> 2.  El algoritmo de clasificación Bayes ingenuo, sus pros y contras.
+> 3.  Cómo implementar Bayes ingenuo con la librería `caret` de `R`.
+> 4.  El algoritmo de clasificación de Árboles de Decisión, sus pros y contras.
+> 5.  Cómo implementar de Árboles de Decisión con la librería `rpart` de `R`.
+
+------------------------------------------------------------------------
+
+<br>
+
+# 1. Introducción
+El aprendizaje **supervisado** es uno de los tipos de aprendizaje automático más utilizados y exitosos. En este capítulo describiremos el aprendizaje supervisado con más detalle y explicaremos dos algoritmos populares, Naïve Bayes y Árboles de Decisión.
+
+Este tipo de aprendizaje se utiliza cuando se requiere predecir un resultado determinado a partir de una entrada determinada. Para lograr esto, es necesario tener datos históricos de pares de entrada/salida, llamado conjunto de entrenamiento, y el objetivo es realizar predicciones precisas para datos nuevos y nunca antes vistos.
+
+Hay dos tipos principales de problemas de aprendizaje automático supervisado: 
+
+-   **Clasificación**, cuyo objetivo es predecir una etiqueta de clase, que es una elección de una lista predefinida de posibilidades. La clasificación a veces se divide en:
+
+    -   _Clasificación binaria_, que es el caso especial de distinguir exactamente entre dos clases. Puede pensar en la clasificación binaria como un intento de responder a una pregunta de sí o no, como por ejemplo identificar si un correo electrónico es spam o no es spam. A menudo se habla de que una clase es la **clase positiva** y la otra es la **clase negativa**. Aquí, positivo no representa tener beneficio o valor, sino cuál es el objeto del estudio. Por lo tanto, al buscar spam, "positivo" podría significar la clase spam. Cuál de las dos clases se llama positivo es a menudo un asunto subjetivo y específico del dominio.
+    
+    -   _Clasificación multiclase_, que es la clasificación entre más de dos clases. Un ejemplo podría ser la predicción de la calidad de un producto en la cual, la variable de salida, la calidad, ha sido definida como una variable categórica cuyos niveles son `"baja"`, `"media"` y `"alta"`. En general, para este tipo de problemas de clasificación multiclase la definición de clase positiva y negativa no tiene mucho sentido.
+
+-   **Regresión**, cuyo objetivo es predecir un número continuo (o un número real en términos matemáticos). Por ejemplo, predecir los ingresos anuales de una persona a partir de su educación, su edad y el lugar donde vive es una tarea de regresión. Al predecir ingresos, el valor predicho es una cantidad y puede ser cualquier número en un rango dado. Otro ejemplo de una tarea de regresión es predecir el rendimiento de una plantación de arándanos dados atributos como rendimientos anteriores, clima y número de empleados. El rendimiento, la variable de salida a predecir, puede ser un número arbitrario.
+
+Una manera fácil de distinguir entre tareas de clasificación y regresión es preguntarse si existe algún tipo de continuidad en el resultado. Así, si hay continuidad entre los posibles resultados, entonces el problema es de regresión. 
+
+El clasificador Naïve Bayes es un clasificador probabilístico simple que se basa en el [Teorema de Bayes](https://es.wikipedia.org/wiki/Teorema_de_Bayes) pero con fuertes suposiciones respecto a la independencia de las variables. Históricamente, esta técnica se hizo popular entre las aplicaciones de filtrado de correo electrónico, detección de spam y categorización de documentos. Aunque a menudo es superado por otras técnicas, y a pesar del diseño ingenuo y los supuestos simplificados, este clasificador puede funcionar bien en muchos problemas complejos del mundo real. Y dado que es un algoritmo eficiente en el uso de recursos (es rápido y se escala bien), definitivamente es un algoritmo de aprendizaje automático para tener incluido en su kit de herramientas.
+
+Por otro lado, los árboles de regresión dividen un conjunto de datos en grupos más pequeños y luego ajustan un modelo simple (constante) para cada subgrupo. Desafortunadamente, un modelo de árbol único tiende a ser muy inestable y un mal predictor, sin embargo, mediante el uso de la técnica de [agregación Bootstrap](https://es.wikipedia.org/wiki/Agregaci%C3%B3n_de_bootstrap), se puede volver a este tipo de modelos en una herramienta bastante poderosa y efectiva. Además, los árboles de decisión son la base fundamental para construir modelos más complejos, como [_Random Forest_](https://es.wikipedia.org/wiki/Random_forest) y [_Gradient Boosting Machines_](https://en.wikipedia.org/wiki/Gradient_boosting).
+
+<br>
+
+# 2. Clasificación usando Naïve Bayes
+## 2.1. Aprendizaje probabilístico: Una visión ingenua
+### 2.1.1. La idea
+El clasificador ingenuo de Bayes se basa en la [probabilidad bayesiana](https://en.wikipedia.org/wiki/Bayesian_probability), desarrollada por el reverendo Thomas Bayes. La probabilidad bayesiana incorpora el concepto de [**probabilidad condicional**](https://es.wikipedia.org/wiki/Probabilidad_condicionada), es decir, la probabilidad de que el evento $A$ ocurra dado que el evento $B$ ha ocurrido, lo que se denota como $P(A \mid B)$. 
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+Por ejemplo, consideremos que estamos analizando una base de datos relacionada con el área de recursos humanos de una empresa, la cual contiene información sobre los trabajadores de ésta. 
+
+En particular, el objetivo es construir un modelo que permita predecir si un trabajador dejará o no su trabajo ( _Attrition_ o deserción laboral) en función de la información que está registrada en la base de datos histórica (trabajadores actuales y trabajadores que ya no están en la empresa). 
+
+Básicamente, y para simplificar la discusión, supongamos que las variables (independientes o predictoras, $X$) incluidas en la base de datos están relacionadas con información sobre el nivel educacional, el nivel de satisfacción respecto al ambiente laboral, el grado de involucramiento en el trabajo, el nivel de satisfacción respecto al puesto, las evaluaciones de desempeño, el nivel de satisfacción respecto a las relaciones interpersonales y una apreciación personal respecto a cómo se siente en general el trabajador en su puesto. 
+
+Todas las variables predictoras son categóricas con 2 o 4 niveles (con un ordenamiento asociado). Por otro lado, la variable dependiente (o variable de salida, $Y$) es categórica binaria, cuyos niveles o clases son `Yes` (dejó la empresa) y `No` (aún está en la empresa).
+
+Así, el objetivo será buscar la probabilidad
+
+$$
+P(y \mid x_{1}, x_{2}, \ldots, x_{7})
+$$
+
+de que un empleado pertenezca a la clase $Y = y$, **dado** que los valores de las variables predictoras son $X_{1} = x_{1}$, $X_{2} = x_{2}$, $\ldots$, $X_{7} = x_{7}$. 
+
+Recuerde que la variable $Y$ puede tomar solo uno de los valores: $y = Yes$ (clase positiva), o $y = No$ (clase negativa).
+
+:::
+
+<br>
+
+En general, para $p$ variables predictoras, la expresión que permite calcular esta probabilidad condicional es el Teorema de Bayes:
+
+$$
+P(y \mid x_{1}, x_{2}, \ldots, x_{p}) = \frac{P(y) P(x_{1}, x_{2}, \ldots, x_{p} \mid y)}{P(x_{1}, x_{2}, \ldots, x_{p})},
+$$
+
+dónde:
+
+-   $P(y)$ es llamada _prior_ (o anterior) y es la probabilidad de que la variable respuesta tome el valor de clase $y$ independientemente del conjunto de valores que puedan tener las variables predictoras $X$. Básicamente, según los datos históricos, entrega la probabilidad de la clase $y$ de la variable respuesta $Y$.
+
+-   $P(x_{1}, x_{2}, \ldots, x_{p})$ es llamada _evidencia_ y es la probabilidad de que las variables predictoras tomen en conjunto, el conjunto de valores $x_{1}$, $x_{2}$, $\ldots$, $x_{p}$ independiente del valor que pueda tener la variable respuesta $Y$. Básicamente, según los datos históricos, entrega la probabilidad de cada combinación observada de variables predictoras. Cuando llegan nuevos datos, esto se convierte en nuestra evidencia.
+
+-   $P(x_{1}, x_{2}, \ldots, x_{p} \mid y)$ es llamada _verosimilitud_ y es la probabilidad de ocurrencia de cada conjunto de valores $x_{1}$, $x_{2}$, $\ldots$, $x_{p}$ de las variables predictoras $X$ para la clase $y$ de la variable respuesta. Básicamente, según los datos históricos, entrega la probabilidad de observar los valores de los predictores cuando la clase respuesta es $y$.
+
+-   $P(y \mid x_{1}, x_{2}, \ldots, x_{p})$ es llamada _posterior_ y es la probabilidad de que una observación pertenezca a la clase de respuesta $y$ dado que las variables predictoras asumen los valores $x_{1}$, $x_{2}$, $\ldots$, $x_{p}$. 
+
+Así, el Teorema de Bayes dice que al combinar la información observada, se actualiza la información a priori sobre las probabilidades para calcular una probabilidad posterior de que una observación sea de la clase $y$. En palabras simples, podemos reescribir la ecuación anterior de Bayes como: 
+
+$$ 
+\text{posterior} = \frac{\text{prior} \times \text{verosimilitud}}{\text{evidencia}}
+$$
+
+Aunque la primera ecuación tiene una belleza simplista en su superficie, se vuelve compleja e intratable a medida que aumenta el número de variables predictoras. De hecho, para calcular la probabilidad a posterior para una variable respuesta que tiene $m$ clases, y un conjunto de datos con $p$ predictores, se requerirían $m^p$ probabilidades calculadas. Por ejemplo, si tenemos $2$ clases y $31$ variables, necesitamos calcular $2^{31} = 2.147.483.648$ probabilidades!
+
+### 2.1.2. El clasificador simplificado
+En consecuencia, el clasificador ingenuo de Bayes hace una suposición simplificadora (de ahí el nombre) para permitir que el cálculo sea viable: se asume que las variables predictoras son [condicionalmente independientes](https://es.wikipedia.org/wiki/Independencia_condicional) entre sí. Esta es una suposición extremadamente fuerte. Sin embargo, al hacer esta suposición, los cálculos se simplifican de manera que la probabilidad a posterior será simplemente el producto de la distribución de probabilidad para cada variable individual condicionada a la categoría de respuesta. En efecto:
+
+$$
+P(y \mid x_{1}, x_{2}, \ldots, x_{p}) = P(y) \prod_{i = 1}^{n}P(x_{i} \mid y)
+$$
+
+de modo que solo es necesario calcular $m \times p$ probabilidades (esto equivale a solo $62$ términos en el ejemplo de $m = 2$ clases y $p = 31$ variables), lo cual se transforma en una tarea mucho más manejable.
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+Volvamos al ejemplo de determinar si un trabajador deja o no la empresa. Considere la siguiente tabla, que contiene los datos históricos de 1470 trabajadores:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+attrition_data <- readr::read_csv(here::here('data/WA_Fn-UseC_-HR-Employee-Attrition.csv'))
+
+attrition_data_simplified <- attrition_data %>% 
+  dplyr::select(Attrition, Education, EnvironmentSatisfaction, JobInvolvement, 
+                JobSatisfaction, PerformanceRating, RelationshipSatisfaction, WorkLifeBalance) %>% 
+  dplyr::mutate(Attrition = factor(Attrition),
+                Education = factor(Education, 
+                                   labels = c("below college", "college", "bachelor", "master", "doctor")),
+                EnvironmentSatisfaction = factor(EnvironmentSatisfaction, 
+                                                 labels = c("low", "medium", "high", "very high")),
+                JobInvolvement = factor(JobInvolvement,
+                                        labels = c("low", "medium", "high", "very high")),
+                JobSatisfaction = factor(JobSatisfaction,
+                                         labels = c("low", "medium", "high", "very high")),
+                PerformanceRating = factor(PerformanceRating,
+                                           labels = c("excellent", "outstanding")),
+                RelationshipSatisfaction = factor(RelationshipSatisfaction,
+                                                  labels = c("low", "medium", "high", "very high")),
+                WorkLifeBalance = factor(WorkLifeBalance,
+                                         labels = c("bad", "good", "better", "best")))
+
+attrition_data_simplified
+```
+
+<br>
+
+Para usar la expresión del clasificador simplificado de Bayes es necesario obtener las frecuencias para cada una de las clases presentes de cada una de las variables. En efecto:
+
+-   Tabla de frecuencia para la variable respuesta `Attrition`.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+attrition_freq_table <- attrition_data_simplified %>% 
+    select(Attrition) %>% 
+    count(Attrition) %>% 
+    group_by(Attrition) %>% 
+    mutate(prop = n/nrow(attrition_data))
+attrition_freq_table
+```
+
+<br>
+
+-   Tabla de frecuencia para la variable predictora `Education`.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+education_freq_table <- attrition_data_simplified %>% 
+    select(Attrition, Education) %>% 
+    count(Attrition, Education) %>% 
+    group_by(Attrition) %>% 
+    mutate(prop = prop.table(n))
+education_freq_table
+```
+
+<br>
+
+-   Tabla de frecuencia para la variable predictora `EnvironmentSatisfaction`.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+EnvironmentSatisfaction_freq_table <- attrition_data_simplified %>% 
+    select(Attrition, EnvironmentSatisfaction) %>% 
+    count(Attrition, EnvironmentSatisfaction) %>% 
+    group_by(Attrition) %>% 
+    mutate(prop = prop.table(n))
+EnvironmentSatisfaction_freq_table
+```
+
+<br>
+
+-   Tabla de frecuencia para la variable predictora `JobInvolvement`.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+JobInvolvement_freq_table <- attrition_data_simplified %>% 
+    select(Attrition, JobInvolvement) %>% 
+    count(Attrition, JobInvolvement) %>% 
+    group_by(Attrition) %>% 
+    mutate(prop = prop.table(n))
+JobInvolvement_freq_table
+```
+
+<br>
+
+-   Tabla de frecuencia para la variable predictora `JobSatisfaction`.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+JobSatisfaction_freq_table <- attrition_data_simplified %>% 
+    select(Attrition, JobSatisfaction) %>% 
+    count(Attrition, JobSatisfaction) %>% 
+    group_by(Attrition) %>% 
+    mutate(prop = prop.table(n))
+JobSatisfaction_freq_table
+```
+
+<br>
+
+-   Tabla de frecuencia para la variable predictora `PerformanceRating`.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+PerformanceRating_freq_table <- attrition_data_simplified %>% 
+    select(Attrition, PerformanceRating) %>% 
+    count(Attrition, PerformanceRating) %>% 
+    group_by(Attrition) %>% 
+    mutate(prop = prop.table(n))
+PerformanceRating_freq_table
+```
+
+<br>
+
+-   Tabla de frecuencia para la variable predictora `RelationshipSatisfaction`.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+RelationshipSatisfaction_freq_table <- attrition_data_simplified %>% 
+    select(Attrition, RelationshipSatisfaction) %>% 
+    count(Attrition, RelationshipSatisfaction) %>% 
+    group_by(Attrition) %>% 
+    mutate(prop = prop.table(n))
+RelationshipSatisfaction_freq_table
+```
+
+<br>
+
+-   Tabla de frecuencia para la variable predictora `WorkLifeBalance`.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+WorkLifeBalance_freq_table <- attrition_data_simplified %>% 
+    select(Attrition, WorkLifeBalance) %>% 
+    count(Attrition, WorkLifeBalance) %>% 
+    group_by(Attrition) %>% 
+    mutate(prop = prop.table(n))
+WorkLifeBalance_freq_table
+```
+
+<br>
+
+Con esta información es posible predecir si un trabajador dejará o no la empresa. Supongamos que los valores, para cada una de las variables, son los siguientes para este trabajador:
+
+-   `Education = "doctor"`,
+-   `EnvironmentSatisfaction = "low"`,
+-   `JobInvolvement = "high"`,
+-   `JobSatisfaction = "medium"`,
+-   `PerformanceRating = "outstanding"`,
+-   `RelationshipSatisfaction = "low"`,
+-   `WorkLifeBalance = "better"`. 
+
+<br>
+
+En efecto, hay que calcular las probabilidades:
+
+\begin{array}{ll}
+P(\text{Yes} \mid \text{X`s}) = 0.1612 \times 0.0211 \times 0.3038 \times 0.5274 \times 0.1941 \times 0.1561 \times 0.2405 \times 0.5359  \\ 
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ = 2.128152e-06,  \\
+\\ 
+P(\text{No} \mid \text{X`s}) \ = 0.8388 \times 0.0349 \times 0.1719 \times 0.6026 \times 0.1898 \times 0.1533 \times 0.1776 \times 0.6215 \\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ = 9.738931e-06.
+\end{array}
+
+<br>
+
+Luego, como $P(\text{Yes} \mid \text{X`s})$ es menor que $P(\text{No} \mid \text{X`s})$, se concluye que el trabajador no dejará la empresa.
+
+:::
+
+<br>
+
+Tal como se aprecia en el ejemplo anterior, para las variables categóricas el cálculo es bastante simple, ya que solo usa las frecuencias de los datos. Sin embargo, cuando se incluyen variables predictoras continuas, a menudo se hace una segunda suposición: **que las variables se distribuyen según una [distribución normal](https://es.wikipedia.org/wiki/Distribuci%C3%B3n_normal)**, de modo que podamos calcular la probabilidad a partir de la [función de densidad de probabilidad](https://es.wikipedia.org/wiki/Funci%C3%B3n_de_distribuci%C3%B3n) de la variable.
+
+Por supuesto, algunas variables numéricas pueden normalizarse con una transformación de [Box-Cox](https://es.wikipedia.org/wiki/Transformaci%C3%B3n_Box-Cox); sin embargo, como verá más adelante, también es posible usar estimadores de densidad de kernel no paramétricos para intentar obtener una representación más precisa de las probabilidades de las variables continuas.
+
+### 2.1.3. Suavización de Laplace
+Un problema adicional a tener en cuenta, dado que Bayes ingenuo usa el producto de las probabilidades de las variables condicionadas en cada clase, es cuando los datos nuevos incluyen uno o más niveles para las variables predictoras, que antes no estaban presentes en los datos históricos. En este caso, se tendrá que $P(x_{i} \mid y) = 0$, y este cero se extenderá por toda la multiplicación forzando que la probabilidad a posterior sea cero para esa clase.
+
+Una solución a este problema consiste en utilizar **la suavización de Laplace**. El [suavizador de Laplace](http://naivebayes.blogspot.com/2013/05/clasificador-naive-bayes-como-funciona.html) agrega una pequeña cantidad a cada uno de los recuentos en las frecuencias para cada variable, lo que asegura que cada variable tenga una probabilidad distinta de cero de ocurrir para cada clase. Normalmente, un valor de uno a dos para el suavizador de Laplace es suficiente, pero este es un parámetro de ajuste para incorporar y optimizar con [validación cruzada](https://es.wikipedia.org/wiki/Validaci%C3%B3n_cruzada).
+
+### 2.1.4. Ventajas y defectos
+El clasificador ingenuo de Bayes es simple (tanto intuitivo como computacionalmente), rápido, funciona bien con pequeñas cantidades de datos de entrenamiento y escala bien a grandes conjuntos de datos. Sin embargo, la mayor debilidad del clasificador ingenuo de Bayes es que se basa en una suposición a menudo errónea de variables igualmente importantes e independientes, que da como resultado probabilidades posteriores sesgadas. 
+
+A pesar que la suposición ingenua rara vez se cumple, en la práctica este algoritmo funciona sorprendentemente bien ya que lo que generalmente se necesita no es una probabilidad _posterior_ exacta para cada observación y que sea precisa en términos absolutos, sino que simplemente un orden de rango razonablemente preciso, es decir, no importa conocer la probabilidad _posterior_ exacta de la clase verdadera, sino que, para una observación dada, lo que importa es tener certeza de que la probabilidad _posterior_ de la clase verdadera es mayor que la de la clase falsa.
+
+## 2.2. Implementación usando `R`
+Para implementar el clasificador de Bayes Ingenuo en `R` usaremos la base de datos completa de los trabajadores de la empresa que utilizamos para ejemplificar los conceptos en las secciones anteriores. El conjunto de datos contiene en total 35 variables, de las cuales `Attrition` es la variable respuesta, y puede ser descargado desde [aqui](https://www.kaggle.com/pavansubhasht/ibm-hr-analytics-attrition-dataset).
+
+Usaremos la librería [`caret`](http://topepo.github.io/caret/index.html), la cual contiene la función `train()` que permitirá entrenar un modelo de Bayes ingenuo mediante la especificación del argumento `method = "nb"`. Adicionalmente usaremos la librería [`rsample`](https://rsample.tidymodels.org/) para dividir la base de datos en el conjunto de entrenamiento y validación, y la librería [`corrplot`](https://www.rdocumentation.org/packages/corrplot/versions/0.2-0) que permitirá realizar visualizaciones sobre las correlaciones entre las variables (es decir, analizar la independencia condicional).
+
+Primero, cargaremos las librerías, y leeremos la base de datos `"WA_Fn-UseC_-HR-Employee-Attrition.csv"`, asignándola al objeto `data_attrition`. En efecto:
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+library(rsample)
+library(caret)
+library(corrplot)
+
+data_attrition <- read.csv("WA_Fn-UseC_-HR-Employee-Attrition.csv", stringsAsFactors = FALSE)
+data_attrition
+```
+
+Inspeccionamos el dataframe anterior para revisar los tipos de datos y los valores que contienen cada una de las variables.
+
+```{r}
+str(data_attrition)
+```
+
+
+Luego de una inspección rápida, podemos inferir lo siguiente:
+
+-   La variable `EmployeeNumber` corresponde a un identificador del trabajador, por lo cual no agrega información relevante para el análisis, si no mas bien para trazabilidad. La dejamos pero no será considerada dentro de los análisis.
+-   Aparentemente, las variables `EmployeeCount`, `Over18` y `StandardHours` contienen un solo valor. Si esto es asi, hay que eliminarlas ya que no aportan con variabilidad al análisis.
+-   Hay variables tipo caracter que en realidad pueden ser tratadas de mejor manera como variables categóricas. 
+-   Hay variables tipo numéricas que en realidad pueden ser tratadas de mejor manera como variables categóricas.
+
+Revisemos el primer punto:
+
+```{r}
+unique(data_attrition$EmployeeCount)
+
+unique(data_attrition$Over18)
+
+unique(data_attrition$StandardHours)
+```
+
+Efectivamente, tal como habíamos inferido, las tres variables anteriores son constantes por lo que las eliminaremos.
+
+```{r}
+data_attrition_2 <- data_attrition[, setdiff(names(data_attrition), c("EmployeeCount", "Over18", "StandardHours"))]
+ncol(data_attrition_2)
+```
+
+Por lo tanto, debemos transformarlas y para esto usaremos los niveles que definimos en el ejemplo de la sección anterior para codificar las variables `Attrition`, `Education`, `EnvironmentSatisfaction`, `JobInvolvement`, `JobSatisfaction`, `PerformanceRating`, `RelationshipSatisfaction`, `WorkLifeBalance`. Las variables `JobLevel`. `StockOptionLevel`, `TrainingTimesLastYear` solo las convertimos a factores, pero manteniendo los niveles que ya están definidos.
+
+```{r}
+data_attrition_2$Attrition <- factor(data_attrition_2$Attrition, 
+                                     labels = c("no", "yes"))
+
+data_attrition_2$Education <- factor(data_attrition_2$Education, 
+                                     labels = c("below college", "college", "bachelor", "master", "doctor"))
+
+data_attrition_2$EnvironmentSatisfaction <- factor(data_attrition_2$EnvironmentSatisfaction, 
+                                                   labels = c("low", "medium", "high", "very high"))
+
+data_attrition_2$JobInvolvement <- factor(data_attrition_2$JobInvolvement,
+                                          labels = c("low", "medium", "high", "very high"))
+
+data_attrition_2$JobSatisfaction <- factor(data_attrition_2$JobSatisfaction,
+                                           labels = c("low", "medium", "high", "very high"))
+
+data_attrition_2$PerformanceRating <- factor(data_attrition_2$PerformanceRating,
+                                             labels = c("excellent", "outstanding"))
+
+data_attrition_2$RelationshipSatisfaction <- factor(data_attrition_2$RelationshipSatisfaction,
+                                                    labels = c("low", "medium", "high", "very high"))
+
+data_attrition_2$WorkLifeBalance <- factor(data_attrition_2$WorkLifeBalance,
+                                           labels = c("bad", "good", "better", "best"))
+
+data_attrition_2$JobLevel <- as.factor(data_attrition_2$JobLevel)
+
+data_attrition_2$StockOptionLevel <- as.factor(data_attrition_2$StockOptionLevel)
+
+data_attrition_2$TrainingTimesLastYear <- as.factor(data_attrition_2$TrainingTimesLastYear)
+
+data_attrition_2
+```
+
+Luego, creamos los conjuntos de entrenamiento, `train`, y validación, `validation`, escogiendo una división aleatoria de 70-30. Para esto, usamos la función `initial_split` de la librería `rsample` y fijamos el argumento `strata = "Attrition"` para realizar un [muestreo estratificado](https://es.wikipedia.org/wiki/Muestreo_estratificado) de modo que en ambos conjuntos queden proporciones similares de las clase `yes` y `no`. Fijamos una semilla mediante la función `set.seed()` para asegurar la reproducibilidad en la separación.
+
+```{r}
+set.seed(123)
+split <- initial_split(data_attrition_2, prop = 0.7, strata = "Attrition")
+train <- training(split)
+train
+validation <- testing(split)
+validation
+```
+
+Luego de la separación, vemos que la probabilidad _prior_ de que un empleado deje la empresa es de aproximadamente $16\%$, mientras que la probabilidad que no deje la empresa es de aproximadamente $84\%$ en ambos conjuntos.
+
+```{r}
+attrition_train_table <- table(train$Attrition)
+prop.table(attrition_train_table)
+attrition_test_table <- table(validation$Attrition)
+prop.table(attrition_test_table)
+```
+
+Para revisar si el supuesto de independencia es válido entre las variables predictoras numéricas del conjunto de entrenamiento, calculamos las correlaciones entre éstas. En efecto:
+
+```{r}
+# Filtramos por Attrition = yes para ver como se correlacionan las variables predictoras entre sí asociadas a esa clase.
+# Quitamos la variable EmployeeNumber ya que no aporta al análisis
+train_Attrition_Yes <- train[train$Attrition == "yes", -9]
+
+# Filtramos solo aquellas variables predictoras que son numéricas para poder calcular las correlaciones
+train_Attrition_Yes_numeric <- Filter(is.numeric, train_Attrition_Yes)
+
+# Calculamos las correlaciones
+cor_train_Attrition_Yes_numeric <- cor(train_Attrition_Yes_numeric)
+cor_train_Attrition_Yes_numeric
+
+# Graficamos la matriz anterior para visualizar de mejor manera
+corrplot(cor_train_Attrition_Yes_numeric)
+```
+
+Del gráfico anterior es claro que la independencia no se cumple ya que hay varias variables altamente correlacionadas. A pesar de esto, continuaremos con el objetivo de generar un predictor ingenuo de Bayes.
+
+Por otro lado, si graficamos los perfiles de las distribuciones de (algunas) las variables numéricas, vemos que tampoco se cumple el supuesto de normalidad. En efecto:
+
+```{r}
+ggplot(data = train) +
+  aes(x = Age) +
+  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+
+ggplot(data = train) +
+  aes(x = DailyRate) +
+  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+
+ggplot(data = train) +
+  aes(x = DistanceFromHome) +
+  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+
+ggplot(data = train) +
+  aes(x = HourlyRate) +
+  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+
+ggplot(data = train) +
+  aes(x = MonthlyIncome) +
+  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+
+ggplot(data = train) +
+  aes(x = MonthlyRate) +
+  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+```
+
+Esto no será un problema, ya que como veremos más adelante, usaremos distintos métodos para obtener las probabilidades a partir de sus funciones de distribución de probabilidad.
+
+Para entrenar el modelo de Bayes ingenuo usaremos la función `train` de la librería `caret`. Esta función nos permite escoger el método y realizar el entrenamiento usando cross-validation. 
+
+```{r}
+set.seed(999)
+# 1. Dividimos en variable respuesta y variables predictoras
+features <- setdiff(names(train), "Attrition")
+x <- train[ , features]
+y <- train$Attrition
+
+# 2. Fijamos el número de folds para realizar cross-validation
+train_control <- trainControl(method = "cv", 
+                              number = 10)
+
+# 3. Entrenamos el modelo naive Bayes usando lo anterior
+nb_model_1 <- train(x = x,
+                    y = y,
+                    method = "nb",
+                    trControl = train_control)
+
+# 4. Evaluamos los resultados del entrenamiento
+confusionMatrix(nb_model_1)
+```
+
+Notar que el modelo obtiene un accuracy de $83.2\%$. Teniendo en cuenta que alrededor del $83\%$ de las observaciones en el conjunto de entrenamiento corresponden a `no`, el accuracy general del modelo recién entrenado no es mejor que si solo pronosticamos "no" para cada observación.
+
+Para mejora el accuracy del modelo, se pueden ajustar los hiperparámetros que tiene. Estos son:
+
+-   El parámetro `usekernel` permite usar una estimación de densidad de kernel para variables continuas versus una estimación de densidad Gaussiana.
+-  `Adjust` permite ajustar el ancho de banda de la densidad del kernel (números más grandes significan una estimación de densidad más flexible).
+-  `fL` permite incorporar el suavizador de Laplace.
+
+Veamos en cuánto mejora el modelo si consideramos algunas opciones para los hiperparámetros anteriores:
+
+```{r}
+set.seed(999)
+# 1. Definimos una grilla de valores para los hiperparámetros
+search_grid <- expand.grid(usekernel = c(TRUE, FALSE),
+                           fL = 0:6,
+                           adjust = seq(0, 4, by = 1))
+
+# 2. Entrenamos el modelo naive Bayes usando la grilla anterior
+nb_model_2 <- train(x = x,
+                    y = y,
+                    method = "nb",
+                    trControl = train_control,
+                    tuneGrid = search_grid)
+
+# 3. Ordenamos para ver los top models (interesan aquellos con accuracy mayor que 83%)
+nb_model_2_results <- nb_model_2$results[]
+nb_model_2_results_best <- nb_model_2_results[which(nb_model_2_results$Accuracy > 0.83), ]
+nb_model_2_results_best_ordered <- nb_model_2_results_best[order(-nb_model_2_results_best$Accuracy), ]
+nb_model_2_results_best_ordered
+
+# 4. Graficamos el accuracy de los modelos en la grilla definida
+plot(nb_model_2)
+
+# 5. Evaluamos el mejor modelo
+confusionMatrix(nb_model_2)
+```
+
+De la gráfica anterior observamos que el mejor modelo se obtuvo para `usekernel = TRUE`, `fl = 1` y `adjust = 4`. El accuracy alcanzado es de $85.24\%$, aunque ahora el modelo se equivoca un poco más al predecir correctamente la clase `yes`.
+
+Una segunda opción de mejora que se puede explorar es realizar un preprocesamiento a las variables. En este caso, aplicaremos la transformación de Box-Cox, centraremos las distribuciones, las escalaremos y buscaremos el menor subconjunto de variables que explica el mayor porcentaje de variabilidad (PCA). Veamos:
+
+```{r}
+set.seed(999)
+# 1. Entrenamos el modelo naive Bayes considerando preprocesamiento de las variables
+nb_model_3 <- train(x = x,
+                    y = y,
+                    method = "nb",
+                    trControl = train_control,
+                    tuneGrid = search_grid,
+                    preProc = c("BoxCox", "center", "scale", "pca"))
+
+# 2. Ordenamos para ver los top models (interesan aquellos con accuracy mayor que 83%)
+nb_model_3_results <- nb_model_3$results[]
+nb_model_3_results_best <- nb_model_3_results[which(nb_model_3_results$Accuracy > 0.83), ]
+nb_model_3_results_best_ordered <- nb_model_3_results_best[order(-nb_model_3_results_best$Accuracy), ]
+nb_model_3_results_best_ordered
+
+# 3. Graficamos el accuracy de los modelos en la grilla definida
+plot(nb_model_3)
+
+# 4. Evaluamos el mejor modelo
+confusionMatrix(nb_model_3)
+```
+
+Vemos que con el preprocesamiento el accuracy aumenta un punto porcentual más, es decir, el mejor modelo ahora corresponde a `usekernel = TRUE`, `fl = 1` y `adjust = 1`, logrando un $86.12\%$ de correcta clasificación global. Sin embargo, este modelo predice la clase `no` levente peor que el anterior.
+
+Asumiendo que aceptamos el último modelo, podemos finalmente pasar a la fase de inferencia (predecir sobre datos nuevos). Usaremos el conjunto de datos de validación para realizar las predicciones. En efecto:
+
+```{r}
+pred <- predict(nb_model_3, newdata = validation)
+confusionMatrix(pred, validation$Attrition)
+```
+
+De la tabla anterior vemos que el modelo predice con un accuracy global del $84.32\%$, algo menor que lo que se obtuvo sobre los datos de entrenamiento (esto es esperable que suceda). Sin embargo, al observar la métrica de especificidad, vemos que el modelo no logra reconocer muy bien la clase negativa (es decir, cuando un trabajador renuncia; `Attrition = yes`). Esta baja capacidad en detectar esta clase se debe principalmente al [problema de imbalance de clases](https://medium.com/quantyca/how-to-handle-class-imbalance-problem-9ee3062f2499), el cual se manifiesta cuando una (o varias) de las clases es muy baja en proporción respecto a la otra(s). Existen técnicas para balancear la clases, pero estas están fuera del alcance de este capítulo.
+
+<br>
+
+# 3. Regresión usando Árboles de decisión
+## 3.1. Divide y Vencerás: Una descripción general
+### 3.1.1. La idea
+Existen muchas metodologías para construir árboles de regresión, pero una de las más antiguas se conoce como el enfoque del **árbol de clasificación y regresión** (CART - **c**lassification **a**nd **r**egression **t**ree) desarrollado por Breiman et al. en 1984. Esta sección se centra en la parte de **regresión** del algoritmo CART. 
+
+En términos simples, los árboles de regresión básicamente dividen un conjunto de datos en subgrupos más pequeños y luego ajustan una constante para cada observación en el subgrupo. La partición se logra mediante sucesivas particiones binarias (también conocidas como particiones recursivas) basadas en los diferentes predictores. La constante a predecir se basa en los valores de respuesta promedio para todas las observaciones que caen en ese subgrupo.
+
+En efecto, considere un problema de regresión con variable respuesta continua $Y$ y con dos variables predictoras $X_1$ y $X_2$, cada una tomando valores en el intervalo unitario. En la siguiente figura, el panel superior izquierdo muestra una partición del espacio de características por líneas que son paralelas a los ejes de coordenadas. En cada elemento de partición podemos modelar $Y$ con una constante diferente. Sin embargo, hay un problema: aunque cada línea de partición tiene una descripción simple como $X_1 = c$, algunas de las regiones resultantes son complicadas de describir.
+
+<br>
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2024-10/images/Figura_2_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.png "")
+
+</center>
+<br>
+
+Para simplificar las cosas, considere solo particiones binarias recursivas como la del panel superior derecho de la figura. Primero dividimos el espacio en dos regiones y modelamos la respuesta por la media de $Y$ en cada región. Elegimos la variable y el punto de división para lograr el mejor ajuste. Luego, una o ambas de estas regiones se dividen en dos regiones más, y este proceso continúa hasta que se aplica alguna regla de detención. Por ejemplo, en el panel superior derecho de la figura, primero dividimos en $X_1 = t_1$. Entonces, la región $X_1 \leq t_1$ se divide en $X_2 = t_2$ y la región $X_1 > t_1$ se divide en $X_1 = t_3$. Finalmente, la región $X_1 > t_3$ se divide en $X_2 = t_4$. El resultado de este proceso es la partición de cinco regiones $R_1, R_2, \ldots , R_5$ mostrada en el panel superior derecho de la figura. El modelo de regresión correspondiente predice entonces $Y$ con una constante $c_m$ en la región $R_m$, es decir,
+
+$$
+\hat{f}(X) = \sum_{m = 1}^5 c_mI\{(X_1, X_2) \in R_m \},
+$$
+
+donde la función $I$ nos dice que es uno si se cumple el argumento $(X_1, X_2) \in R_m$ o es cero si no se cumple.
+
+Una representación de este modelo es el árbol binario en el panel inferior izquierdo de la figura. En éste, el conjunto de datos completo se encuentra en la parte superior del árbol y, las observaciones que satisfacen la condición en cada bifurcación se asignan a la rama izquierda y las demás a la derecha. Los nodos terminales u hojas del árbol corresponden a las regiones $R_1, R_2, \ldots , R_5$. El panel inferior derecho de la figura es una gráfica en perspectiva de la superficie de regresión de este modelo.
+
+<br>
+
+::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
+Veamos un ejemplo concreto. Considere la siguiente base de datos, que contiene información sobre 32 autos:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+cars_df <- mtcars
+cars_df %>% tibble::rownames_to_column(var = "model")
+```
+
+Las variables en el dataframe anterior son:
+
+-   `model`: modelo del auto.
+-   `mpg`: rendimiento del auto en millas por galones.
+-   `cyl`: cantidad de cilindros. Los valores son 4, 6 y 8.
+-   `disp`: desplazamiento.
+-   `hp`: horsepower (caballos de fuerza).
+-   `drat`: Rear axle ratio (relación del eje trasero).
+-   `wt`: peso (en libras).
+-   `qsec`: 1/4 mile time (tiempo en recorrer un cuarto de milla).
+-   `vs`: tipo de motor (0 = V-shaped, 1 = straight).
+-   `am`: tipo de transmisión (0 = automática, 1 = manual).
+-   `gear`: cantidad de cambios.
+-   `carb`: cantidad de carburadores.
+
+y la idea es predecir las millas por galón (`mpg`) que promediará un automóvil en función de los cilindros (`cyl`) y los caballos de fuerza (`hp`) usando un árbol de decisión. 
+
+Suponga que luego de generar el análisis, el árbol de decisión es el que se muestra en la siguiente figura.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+library(rpart)
+library(rpart.plot)
+m1 <- rpart(formula = mpg ~.,
+            data = cars_df,
+            method = "anova")
+rpart.plot(m1)
+```
+
+Entender e interpretar un árbol de decisión es muy sencillo. En efecto, todas las observaciones pasan por el árbol, se evalúan en un nodo en particular y van hacia la izquierda si la respuesta asociada al nodo es "sí" o hacia la derecha si la respuesta es "no". 
+
+Entonces, se tiene que todas las observaciones que tienen $6$ u $8$ cilindros ($66\%$ del total) van a la rama izquierda y todas las demás observaciones ($34\%$ del total) van a la rama derecha. Notar que en este nodo, el nodo raíz, el promedio para `mpg` es de $20$. 
+
+A continuación, la rama izquierda se divide según los caballos de fuerza. Las observaciones en esta rama tienen un promedio para la variable respuesta `mpg` igual a $17$ y aquellas con caballos de fuerza iguales o superiores a $193$ irán a la rama izquierda ($22\%$) mientras que las restantes ($44\%$) irán a la derecha.
+
+Las ramas conducen a nodos terminales u hojas que contienen el valor de respuesta para la variable respuesta `mpg`. Así, básicamente, todos los autos que no tienen $6$ u $8$ cilindros (rama de la derecha) promedian $27$ mpg, mientras que aquellos que tienen $6$ u $8$ cilindros y tienen más de $193$ hp (rama izquierda) promedian $13$ mpg. Finalmente, los que tienen $6$ u $8$ cilindros pero menos de $193$ hp, promediarán $18$ mpg.
+
+Así, la partición recursiva da como resultado tres regiones ($R_{1}$, $R_{2}$, $R_{3}$) donde el modelo predice `mpg` con una constante $c_m$ para la región $R_{m}$:
+
+$$
+\begin{array}{ll}
+\hat{f}(X) = \sum_{m = 1}^3 c_{m} \ I\{(\text{cyl, hp}) \in R_{m} \} \\
+\ \ \ \ \ \ \ \ = 27 \ I(\text{cyl} < 5) \\
+\ \ \ \ \ \ \ \ \ \ \ + 13 \ I(\text{cyl} \geq 5, \ \text{hp} \geq 193) \\
+\ \ \ \ \ \ \ \ \ \ \ + 18 \ I(\text{cyl} = \geq 5, \ \text{hp} < 193)
+\end{array}
+$$
+
+Veamos gráficamente los puntos para hacernos una idea de las regiones generadas al particionar el espacio de variables predictoras `cyl` y `hp`. En efecto:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+ggplot(data = cars_df) + aes(x = cyl, y = hp, color = mpg) +
+  geom_point(size = 3, alpha = 0.8) + 
+  geom_vline(xintercept =  5, color = "gray", linetype = 2) +
+  geom_segment(x = 5, y = 193, xend = 9, yend = 192, color = "gray", linetype = 2) +
+  annotate(geom = "text", x = 4.5, y = 200, label = "R1", color = "red") +
+  annotate(geom = "text", x = 7, y = 120, label = "R2", color = "blue") +
+  annotate(geom = "text", x = 6.5, y = 250, label = "R3", color = "black") +
+  theme(panel.background = element_rect(fill = "white", colour = "black"))
+```
+
+:::
+
+<br>
+
+Sin embargo, queda una pregunta importante: ¿cómo hacer crecer un árbol de regresión?
+
+### 3.1.2. Decidir sobre divisiones
+Primero, es importante darse cuenta de que la partición de variables se realiza de forma **codiciosa** y de arriba hacia abajo. Esto significa que una partición realizada anteriormente en el árbol no cambiará según las particiones posteriores. Pero, ¿cómo se hacen estas particiones? El modelo comienza con el conjunto de datos completo, $S$, y busca cada valor distinto de cada variable de entrada para encontrar el predictor y el valor que divide los datos en dos regiones ($R_{1}$ y $R_{2}$) de manera que se minimice la suma total de errores cuadrados (SSE - **s**um of **s**quared estimate of **e**rrors). Es decir:
+
+$$
+\text{minimizar} \{SSE = \sum_{i \in R_{1}} (y_{i} - c_{1})^2 + \sum_{i \in R_{2}} (y_{ i} - c_{2})^2 \}
+$$
+
+Habiendo encontrado la mejor división, los datos se separan en las dos regiones resultantes y se repite el proceso de división en cada una de las dos regiones. Este proceso continúa hasta que se alcanza algún criterio de parada. El resultado es, por lo general, un árbol complejo y muy profundo que puede producir buenas predicciones en el conjunto de entrenamiento, pero es probable que se sobreajuste a los datos, lo que conduce a un rendimiento deficiente en datos no vistos.
+
+### 3.1.3. Criterio de complejidad
+A menudo hay que lograr un equilibrio entre la profundidad y la complejidad del árbol para optimizar el rendimiento predictivo sobre datos no vistos. Para encontrar este equilibrio, normalmente "cultivamos" un árbol muy grande como se definió en la sección anterior y luego lo **podamos** para encontrar un subárbol óptimo. 
+
+El subárbol óptimo se encuentra usando un parámetro de complejidad ($\alpha$) que penaliza la función objetivo mostrada en la última ecuación, para el número de nodos terminales del árbol ($T$), tal como se muestra en la siguiente expresión:
+
+$$
+\text{minimizar} \{SSE + \alpha T \}
+$$
+
+Así, para un valor dado de $\alpha$, se encuentra el árbol podado más pequeño que tiene el error penalizado más bajo. Las penalizaciones más pequeñas tienden a producir modelos más complejos, lo que resulta en árboles más grandes, mientras que penalizaciones más grandes dan como resultado árboles mucho más pequeños. En consecuencia, a medida que un árbol crece, la reducción del SSE debe ser mayor que la penalización. 
+
+Por lo general, se evalúan varios modelos para algún intervalo de $\alpha$ y se usa la [validación cruzada](http://rstudio-pubs-static.s3.amazonaws.com/405322_6d94d05e54b24ba99438f49a6f8662a9.html) para identificar el $\alpha$ óptimo y, por lo tanto, el subárbol óptimo.
+
+### 3.1.4. Fortalezas y debilidades
+Los árboles de regresión tienen varias ventajas:
+
+-   Son muy interpretables.
+-   Hacer predicciones es rápido (sin cálculos complicados, solo buscando constantes en el árbol).
+-   Es fácil comprender qué variables son importantes para realizar la predicción. Los nodos internos (splits) son aquellas variables que redujeron en mayor medida el SSE.
+-   Si faltan algunos datos, es posible que no podamos descender por el árbol hasta una hoja, pero aún podemos hacer una predicción promediando todas las hojas del subárbol al que llegamos.
+-   El modelo proporciona una respuesta "irregular" no lineal, por lo que puede funcionar cuando la verdadera superficie de regresión no es suave. Sin embargo, si es suave, la superficie constante a trozos puede aproximarse arbitrariamente (con suficientes hojas).
+-   Existen algoritmos rápidos y confiables para generar estos árboles.
+
+Pero también hay algunas debilidades importantes:
+
+-   Los árboles de regresión tienen varianza grande, lo que genera predicciones inestables (una submuestra alternativa de datos de entrenamiento puede cambiar significativamente los nodos terminales).
+-   Debido a la alta varianza, los árboles de regresión simple tienen poca precisión predictiva.
+
+## 3.2. Implementación usando `R`
+Para implementar el árbol de regresión en `R` usaremos la base de datos [Ames Housing](https://cran.r-project.org/web/packages/AmesHousing/AmesHousing.pdf) que describe la venta de propiedad residencial individual en Ames, Iowa de 2006 a 2010. Esta base de datos fue compilada por Dean De Cock para su uso en la educación en ciencia de datos. Más detalles de este conjunto de datos los puede encontrar en [_Ames, Iowa: Alternative to the Boston Housing Data as an End of Semester Regression Project_](http://jse.amstat.org/v19n3/decock.pdf).
+
+Usaremos la librería [`rpart`](https://www.rdocumentation.org/packages/rpart/versions/4.1-15), la cual contiene la función [`rpart()`](https://www.rdocumentation.org/packages/rpart/versions/4.1-15/topics/rpart) que permitirá entrenar un modelo de árbol de regresión mediante la especificación del argumento `method = "anova"`. Adicionalmente usaremos la función [`rpart.plot()`](https://www.rdocumentation.org/packages/rpart.plot/versions/3.0.9/topics/rpart.plot) de la librería [`rpart.plot`](https://www.rdocumentation.org/packages/rpart.plot/versions/3.0.9) para visualizar los árboles de regresión creados y [`rsample`](https://rsample.tidymodels.org/) para dividir la base de datos en el conjunto de entrenamiento y validación. 
+
+Primero, cargaremos las librerías, y leeremos la base de datos `"ames_dataset.csv"`, asignándola al objeto `data_ames`. En efecto:
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+library(rsample)
+library(rpart)
+library(rpart.plot)
+
+data_ames <- read.csv("ames_dataset.csv", stringsAsFactors = FALSE)
+data_ames
+```
+
+Inspeccionamos el dataframe anterior para revisar los tipos de datos y los valores que contienen cada una de las variables.
+
+```{r}
+str(data_ames)
+```
+
+Vemos que el dataframe contiene $2930$ observaciones (filas) y $81$ variables (columnas). De estas, `Sale_Price` será la variable respuesta, ya que estamos interesados en predecir el valor de venta de una casa en función de sus características. Se recomienda revisar la descripción de cada una de las variables para entender a que corresponden cada una de ellas. Para esto, instale la librería `AmesHousing` y ejecute el comando `?ames_raw` para que tenga acceso a la documentación completa de la base de datos. 
+
+Luego, creamos los conjuntos de entrenamiento, `ames_train`, y validación, `aames_validation`, escogiendo una división aleatoria de 70-30. Para esto, usamos la función `initial_split` de la librería `rsample`. Fijamos una semilla mediante la función `set.seed()` para asegurar la reproducibilidad en la separación.
+
+```{r}
+set.seed(123)
+ames_split <- initial_split(data_ames, prop = 0.7)
+ames_train <- training(ames_split)
+ames_train
+ames_validation <- testing(ames_split)
+ames_validation
+```
+
+Nos interesa ver que `Sale_Price` se distribuye de manera similar en ambos conjuntos de datos. Para esto, crearemos dos dataframes con los valores de esta variable de cada conjunto y luego los uniremos por filas mediante la función `rbind()` de manera de tener un solo dataframe con toda la información. Este ultimo lo usaremos para graficar el perfil de ambas distribuciones mediante la función `geom_density()` de `ggplot2`. En efecto:
+
+```{r}
+ames_train_sales_prices <- data.frame(set = "train",
+                                      Sale_Price = ames_train$Sale_Price)
+
+ames_validation_sales_prices <- data.frame(set = "validation",
+                                           Sale_Price = ames_validation$Sale_Price)
+
+ames_sales_prices <- rbind(ames_train_sales_prices,
+                           ames_validation_sales_prices)
+ames_sales_prices
+
+ggplot(data = ames_sales_prices) +
+  aes(x = Sale_Price, color = set) +
+  geom_density()
+```
+
+Vemos que en ambos conjuntos la variable respuesta se distribuye de manera muy similar. ¿Ocurrirá lo mismo con las restantes 80 variables? Veamos solo algunas de ellas (en principio, debiésemos revisar todas, pero eso se lo dejaremos para que lo realice usted!)
+
+```{r}
+ames_train_some_predictors <- data.frame(set = "train",
+                                         Overall_Qual = ames_train$Overall_Qual,
+                                         Neighborhood = ames_train$Neighborhood,
+                                         First_Flr_SF = ames_train$First_Flr_SF,
+                                         Gr_Liv_Area = ames_train$Gr_Liv_Area,
+                                         Total_Bsmt_SF = ames_train$Total_Bsmt_SF,
+                                         Utilities = ames_train$Utilities)
+
+ames_validation_some_predictors <- data.frame(set = "validation",
+                                              Overall_Qual = ames_validation$Overall_Qual,
+                                              Neighborhood = ames_validation$Neighborhood,
+                                              First_Flr_SF = ames_validation$First_Flr_SF,
+                                              Gr_Liv_Area = ames_validation$Gr_Liv_Area,
+                                              Total_Bsmt_SF = ames_validation$Total_Bsmt_SF,
+                                              Utilities = ames_validation$Utilities)
+
+ames_some_predictors <- rbind(ames_train_some_predictors,
+                              ames_validation_some_predictors)
+ames_some_predictors
+
+ames_some_predictors_numerics <- ames_some_predictors[, c("set", "First_Flr_SF", "Gr_Liv_Area", "Total_Bsmt_SF")]
+
+ggplot(data = ames_some_predictors_numerics) +
+  aes(x = First_Flr_SF, color = set) +
+  geom_density()
+
+ggplot(data = ames_some_predictors_numerics) +
+  aes(x = Gr_Liv_Area, color = set) +
+  geom_density()
+
+ggplot(data = ames_some_predictors_numerics) +
+  aes(x = Total_Bsmt_SF, color = set) +
+  geom_density()
+
+ames_some_predictors_categorical <- ames_some_predictors[, c("set", "Overall_Qual", "Neighborhood", "Utilities")]
+
+ggplot(data = ames_some_predictors_categorical) +
+  aes(x = Overall_Qual, fill = set) +
+  geom_bar(position = "dodge2") +
+  coord_flip()
+
+ggplot(data = ames_some_predictors_categorical) +
+  aes(x = Neighborhood, fill = set) +
+  geom_bar(position = "dodge2") +
+  coord_flip()
+
+ggplot(data = ames_some_predictors_categorical) +
+  aes(x = Utilities, fill = set) +
+  geom_bar(position = "dodge2") +
+  coord_flip()
+```
+
+De las gráficas anteriores se aprecia que las variables numéricas conservan su perfil (al menos las que analizamos), sin embargo, para las variables categóricas este patrón no ocurre.
+
+Luego de este breve análisis exploratorio, entrenaremos el modelo de árbol de regresión. Para esto, usamos el siguiente código:
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+dt_model_1 <- rpart(formula = Sale_Price ~.,
+                    data = ames_train,
+                    method = "anova")
+dt_model_1
+```
+
+Analicemos la salida anterior para intentar entender los pasos realizados en cada división. Comenzamos con $n = 2051$ observaciones (y un precio de venta promedio de `Sale_Price = 180775.5`) en el nodo raíz. Aquí, la variable usada para dividir es `Overall_Qual` ya que entre todas, esta minimiza el error ($SSE = 1.273987e+13$). Así, $n = 1703$ observaciones (equivalente al $83\%$) con `Overall_Qual = Above_Average, Average, Below_Average, Fair, Good, Poor, Very_Poor` van al segundo nodo (`2)`). El precio de venta promedio de las observaciones que llegan a este nodo es de `Sale_Price = 156431.40`, mientras que el error es $SSE = 4.032269e+12$.
+
+Por el otro lado, en la rama de la derecha, tenemos el tercer nodo (`3)`). Aquí, $n = 348$ observaciones (equivalente al $17\%$), con `Overall_Qual = Very_Good, Excellent, Very_Excellent`, tienen precios de venta promedio `Sale_Price = 299907.90` y $SEE = 2.759339e+12$. 
+
+Básicamente, lo anterior nos está diciendo que la variable más importante (que tiene la mayor reducción en la SEE) es `Overall_Qual`, con casas en el extremo superior del espectro de calidad que tienen casi el doble del precio de venta promedio.
+
+Un análisis similar se puede seguir realizando para entender los siguientes nodos y ramas. Sin embargo, es mucho más fácil entender el árbol a través de una visualización gráfica. En efecto:
+
+```{r}
+rpart.plot(dt_model_1)
+```
+
+`rpart.plot` tiene muchas opciones para graficar el árbol, que dejaremos para que usted las explore. Sin embargo, en la gráfica por defecto, se muestra el porcentaje de datos que caen en un nodo y el valor promedio de la variable respuesta en esta partición (en este caso, el precio de venta promedio). Tres cosas importantes que se pueden notar son:
+
+-   El árbol generado contiene $12$ nodos internos que resultan en $13$ nodos terminales.
+-   Ninguno de los nodos terminales (aquellos marcados con un asterisco) tiene menos de 7 observaciones.
+-   Básicamente, el árbol se divide usando solo $5$ variables distintas para producir el modelo entrenado. Sin embargo, hay $80$ variables en `ames_train`. ¿Qué ocurre con las restantes?
+
+Lo anterior puede ser explicado si entendemos el mecanismo de construcción del árbol. Para generar el árbol, `rpart` usa 9 parámetros cuyos valores vienen predefinidos por defecto (para más detalle revise la documentación de la función `rpart.control()`). Estos nueve parámetros básicamente le indican al algoritmo dos cosas: que criterios usa para determinar las divisiones y que criterio usa para podar el árbol. 
+
+De estos nueve parámetros, son cinco los más usados para definir _a priori_ la estructura final del árbol (el criterio a aplicar en cada paso de construcción del árbol). Estos son:
+
+-   `minsplit`: cantidad mínima de observaciones en un nodo antes de decidir si ese nodo se divide o no. El valor por defecto es $20$. Pequeños valores permiten a los nodos terminales contener solo un puñado de observaciones.
+-   `maxdepth`: profundidad máxima del árbol, es decir, el número máximo de nodos internos entre el nodo raíz y los nodos terminales. El valor por defecto es $30$.
+-   `minbucket`: cantidad mínima de observaciones en un nodo final. Si dividir un nodo resulta en nodos que contienen contiene menos observaciones que esta cantidad, entonces no ese nodo no se bifurcará. El valor por defecto es el número entero obtenido al dividir `minsplit` por 3.
+-   `cp`: parámetro de complejidad. El valor por defecto es 0.01. Si agregar otra división al árbol no mejora la performance del modelo en una cantidad igual a `cp`, entonces ese nodo no se bifurca. En otras palabras, si el valor del parámetro calculado para alguna profundidad del árbol es menor que el valor de referencia fijado, entonces los nodos en este nivel no se bifurcarán.
+- `xval`: cantidad de folds usadas para validación cruzada. El valor por defecto es 10. El modelo es entrenado con los $k - 1$ chunks de entrenamiento y el error es calculado usando el chunk de validación. El error final será el promedio de los errores de cada fold.
+
+La siguiente figura ilustra algunos ejemplos para entender el funcionamiento de los parámetros anteriores.
+
+<br>
+<center>
+
+![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2024-10/images/Figura_3_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.jpg "")
+
+</center>
+<br>
+
+Es importante entender cómo se calcula el parámetro de complejidad y para esto, hay que entender a expresión usada para calcularlo:
+
+$$
+cp = \frac{p(\text{incorrect}_{l + 1}) - p(\text{incorrect}_{l})}{n(\text{splits}_{l}) - n(\text{splits}_{l + 1})},
+$$
+
+donde $p(\text{incorrect})$ es el error relativo a una profundidad dada en el árbol y $n(\text{splits})$ es el número de divisiones a esa profundidad. El índice $l$ indica la profundidad, donde $l = 0$ es para el nodo raíz. Así, tomemos como ejemplo el árbol que acabamos de entrenar y mediante el comando `dt_model_1$cptable` rescatemos la tabla de valores para el parámetro `cp`:
+
+```{r}
+dt_model_1$cptable
+```
+
+Partiendo de arriba hacia abajo, vemos que el árbol cada vez crece en tamaño (`nsplit` aumenta; los valores de esta columna corresponden al índice $l$ de la ecuación que define a `cp`). Así, para un árbol con solo el nodo raíz se tendrá que el parámetro de complejidad si el árbol crece con una separación adicional es:
+
+$$
+cp = \frac{1 - 0.5330987}{1 - 0} = 0.4669013
+$$
+
+Como hemos usado el valor por defecto `cp = 0.01`, entonces esta división es factible. Una vez realizada la división, calculamos el siguiente valor de `cp` para ver si es factible hacer una división más y seguir creciendo el árbol:
+
+$$
+cp = \frac{0.5330987 - 0.4134846}{2 - 1} = 0.1196141
+$$
+
+Nuevamente, comparamos este valor con el valor de referencia (`cp = 0.01`) y vemos que la división es factible. Seguimos de la misma manera hasta que el costo de complejidad de la siguiente división sea menor que el valor de referencia fijado. En este ejemplo, eso ocurre en la fila 12 de la tabla, para la cual se tiene que el árbol se dividió 12 veces (revise el gráfico del árbol en cuestión y cuente el número de divisiones en el), lo que en definitiva corresponde a 13 nodos finales.
+
+Es posible revisar una gráfica usando el comando `plotcp(dt_model_1)` que muestra el perfil del error de validación cruzada (eje $y$) en función del del parámetro `cp` (eje $x-inferior$) y del número de nodos terminales (eje $x-superior$) o $\text{tamaño del árbol} = |T|$. Para este ejemplo se tiene:
+
+```{r}
+plotcp(dt_model_1)
+```
+
+También puede notar la línea punteada que pasa por el punto $|T| = 8$. Breiman et al. (1984) sugieren otra regla para seleccionar el mejor árbol, llamada **regla 1-SE**, la cual sugiere elegir un árbol más pequeño (menos complejo) cuyo error de validación sea a lo más igual al error de validación del árbol obtenido mediante el criterio de complejidad más una desviación estándar de ese error. En efecto, si volvemos a la tabla de valores `cp` de nuestro árbol, vemos que `xerror = 0.2635207` y `xstd = 0.01881691`, por lo tanto el árbol que elegiríamos según esta regla sería aquel con $\text{xerror} \leq 0.2635207 + 1 * 0.01881691 = 0.2823376$, es decir, el árbol con `nsplit = 7` o equivalentemente, con 8 nodos terminales.
+
+
+Para ilustrar el punto anterior es posible forzar a `rpart` para que genere un árbol completo. Para esto, usamos `cp = 0` (sin penalización) dentro del argumento auxiliar `control`. En efecto: 
+
+```{r}
+dt_model_complete <- rpart(formula = Sale_Price ~ .,
+                           data    = ames_train,
+                           method  = "anova", 
+                           control = list(cp = 0, xval = 10))
+
+rpart.plot(dt_model_complete)
+plotcp(dt_model_complete)
+abline(v = 13, lty = "dashed")
+```
+
+De la ultima gráfica se observa que después de $13$ nodos terminales la tasa de disminución del error es cada vez más pequeña a medida que el árbol crece. Por lo tanto, podemos podar el árbol y dejarlo con $13$ nodos terminales sin sacrificar significativamente su performance. 
+
+Podemos concluir entonces que, de manera predeterminada, `rpart` realiza algunos ajustes automáticos, para así entrenar un subárbol óptimo de $12$ divisiones, $13$ nodos terminales y un error de validación cruzada de $0.2635207$. Sin embargo, podemos realizar ajustes adicionales para intentar mejorar el rendimiento del modelo.
+
+## 3.3. Afinación del modelo
+`rpart` usa un argumento de control especial donde proporcionamos una lista de valores de hiperparámetros. Por ejemplo, si quisiéramos evaluar un modelo con `minsplit = 10` y `maxdepth = 3`, podríamos ejecutar lo siguiente:
+
+```{r}
+dt_model_2 <- rpart(formula = Sale_Price ~ .,
+                    data    = ames_train,
+                    method  = "anova", 
+                    control = list(minsplit = 10, 
+                                   maxdepth = 3, 
+                                   xval = 10))
+
+rpart.plot(dt_model_2)
+plotcp(dt_model_2)
+dt_model_2$cptable
+```
+
+Resulta interesante poder probar con varias combinaciones de `minsplit` y `maxdepth`, pero hacerlas una a una es poco práctico. Para automatizar este proceso, usaremos una grilla con $384$ combinaciones, generada a partir de los valores entre 5 y 20 para `minsplit`,  entre 8 y 15 para `maxdepth` y 0.1, 0.01, 0.001 para `cp`. En efecto:
+
+```{r}
+hyper_grid <- expand.grid(minsplit = seq(5, 20, 1),
+                          maxdepth = seq(8, 15, 1),
+                          cp       = c(0.1, 0.01, 0.001))
+
+hyper_grid
+
+nrow(hyper_grid)
+```
+
+Mediante un ciclo `for`, recorremos la grilla y entrenamos un modelo por cada una de las 384 combinaciones posible, es decir:
+
+```{r}
+set.seed(1)
+# Creamos una lista vacía en la cual iremos guardando cada uno de los modelos entrenados
+models <- list()
+
+# Ciclo for para entrenar un modelo por cada combinación de valores
+for (i in 1:nrow(hyper_grid)) {
+  
+  # Valores de minsplit y maxdepth en la fila i
+  minsplit <- hyper_grid$minsplit[i]
+  maxdepth <- hyper_grid$maxdepth[i]
+  cp <- hyper_grid$cp[i]
+
+  # Entrenamos un modelo y lo guardamos en la lista creada
+  models[[i]] <- rpart(formula = Sale_Price ~ .,
+                       data    = ames_train,
+                       method  = "anova",
+                       control = list(minsplit = minsplit, 
+                                      maxdepth = maxdepth, 
+                                      cp       = cp))
+}
+```
+
+Ahora, solo queda rescatar el mejor árbol (aquel con menor error de validación) para cada una de las 384 combinaciones. Para esto, construimos las siguientes funciones:
+
+```{r}
+# Funcion para obtener el xerror óptimo
+get_min_xerror <- function(x) {
+  min <- which.min(x$cptable[, "xerror"])
+  xerror <- x$cptable[min, "xerror"] 
+}
+
+# Funcion para obtener el cp óptimo asociado al menor xerror
+get_cp <- function(x) {
+  min <- which.min(x$cptable[, "xerror"])
+  cp <- x$cptable[min, "CP"] 
+}
+
+# Funcion para obtener el nsplit óptimo asociado al menor xerror
+get_min_nsplit <- function(x) {
+  min <- which.min(x$cptable[, "xerror"])
+  nsplit <- x$cptable[min, "nsplit"] 
+  }
+```
+
+y las usamos dentro de un ciclo `for` para rescatar los valores buscados. Guardamos los valores en un dataframe:
+
+```{r}
+# Creamos un dataframe vacio para almacenar los valores
+best_models_parameters <- data.frame(cp     = as.numeric(),
+                                     nsplit = as.numeric(),
+                                     xerror = as.numeric())
+
+# Ciclo for para buscar los valores óptimos y guardarlos en el dataframe
+for (i in 1:nrow(hyper_grid)) {
+  best_models_parameters[i, 1] <- get_cp(models[[i]])
+  best_models_parameters[i, 2] <- get_min_nsplit(models[[i]])
+  best_models_parameters[i, 3] <- get_min_xerror(models[[i]])
+}
+
+# Imprimimos el dataframe generado
+best_models_parameters
+```
+
+Finalmente, juntamos el dataframe de la grilla con el dataframe de las mejores métricas de cada modelo y ordenamos de menor a mayor respecto al error de validación cruzada:
+
+```{r}
+hyper_parameter_best_models <- cbind(hyper_grid, best_models_parameters)
+
+hyper_parameter_best_models[order(hyper_parameter_best_models$xerror), ]
+```
+
+Vemos entonces que el mejor árbol será aquel con `minsplit = 12`, `maxdepth = 14`, `cp = 0.001125284`, el cual tendrá 42 divisiones y 43 nodos terminales.
+
+Si aceptamos este como modelo final, entrenamos un árbol de acuerdo a esos parámetros:
+
+```{r}
+optimal_dt_model <- rpart(formula = Sale_Price ~ .,
+                          data    = ames_train,
+                          method  = "anova",
+                          control = list(minsplit = 12, 
+                                         maxdepth = 14, 
+                                         cp       = 0.001125284))
+
+rpart.plot(optimal_dt_model)
+```
+
+Finalmente, usamos el modelo anterior para realizar predicciones sobre el conjunto de datos de validación para ver que tan bueno es usando datos nuevos. Esto se ejecuta mediante la función `predict(modelo, newdata = validation_data)`. Antes si, hay que agregar los niveles faltantes a aquellas variables categóricas del conjunto de validación (¿se acuerda cuando hicimos el análisis exploratorio y vimos que habían diferencias para algunas variables categóricas cuando comparamos el conjunto de entrenamiento con el de validación?) Mediremos el desempeño final sobre los datos usando la métrica [RMSE](https://en.wikipedia.org/wiki/Root-mean-square_deviation). En efecto:
+
+
+```{r}
+# Agregamos los niveles faltantes para aquellas variables categóricas
+ames_validation$MS_SubClass <- factor(ames_validation$MS_SubClass, 
+                                      levels = levels(ames_train$MS_SubClass))
+
+ames_validation$Utilities <- factor(ames_validation$Utilities, 
+                                    levels = levels(ames_train$Utilities))
+
+ames_validation$Neighborhood <- factor(ames_validation$Neighborhood, 
+                                       levels = levels(ames_train$Neighborhood))
+
+ames_validation$Condition_2 <- factor(ames_validation$Condition_2, 
+                                      levels = levels(ames_train$Condition_2))
+
+ames_validation$Exterior_1st <- factor(ames_validation$Exterior_1st, 
+                                       levels = levels(ames_train$Exterior_1st))
+
+ames_validation$Bsmt_Qual <- factor(ames_validation$Bsmt_Qual, 
+                                    levels = levels(ames_train$Bsmt_Qual))
+
+ames_validation$Kitchen_Qual <- factor(ames_validation$Kitchen_Qual, 
+                                       levels = levels(ames_train$Kitchen_Qual))
+
+ames_validation$Functional <- factor(ames_validation$Functional, 
+                                     levels = levels(ames_train$Functional))
+
+ames_validation$Garage_Qual <- factor(ames_validation$Garage_Qual, 
+                                      levels = levels(ames_train$Garage_Qual))
+
+ames_validation$Roof_Matl <- factor(ames_validation$Roof_Matl, 
+                                    levels = levels(ames_train$Roof_Matl))
+
+ames_validation$Exterior_2nd <- factor(ames_validation$Exterior_2nd, 
+                                       levels = levels(ames_train$Exterior_2nd))
+
+ames_validation$Misc_Feature <- factor(ames_validation$Misc_Feature, 
+                                       levels = levels(ames_train$Misc_Feature))
+
+ames_validation$Mas_Vnr_Type <- factor(ames_validation$Mas_Vnr_Type, 
+                                       levels = levels(ames_train$Mas_Vnr_Type))
+
+ames_validation$Electrical <- factor(ames_validation$Electrical, 
+                                     levels = levels(ames_train$Electrical))
+
+# Usamos el modelo final para predecir sobre los datos de validación
+pred <- predict(optimal_dt_model, 
+                newdata = ames_validation)
+
+# Calculamos el root mean squared error (RMSE) para medir la performance del modelo
+RMSE(pred = pred, 
+     obs = ames_validation$Sale_Price)
+```
+
+De acuerdo con el valor anterior, podemos concluir que nuestro modelo final predice el precio de una casa con un error promedio de $\$34566.8$ dólares. Nada mal si tomamos en cuenta que el valor promedio de venta de las casas en el conjunto de validación es de $\$180844$. 
+
+Veamos gráficamente como son las predicciones respecto a los valores reales. Para esto, generamos un dataframe con los valores de `Sale_Price` reales, provenientes del conjunto de datos de validación, y los valores predichos por el modelo. Luego, usamos este dataframe para graficar la relación. En efecto:
+
+```{r}
+Sale_Prices_df <- data.frame(Real_Sale_Price = ames_validation$Sale_Price, 
+                             Predicted_Sale_Price = pred)
+Sale_Prices_df
+
+ggplot(data = Sale_Prices_df) + 
+  aes(x = Predicted_Sale_Price, y = Real_Sale_Price) + 
+  geom_point()
+```
+
+Del gráfico se observa que para valores menores del precio de venta la dispersión en la predicción es menor. Además, se ve claramente que el modelo predice valores promedio, por eso se ve como si el eje $x$ fuera discreto (hay tantas franjas verticales como nodos finales tiene el árbol!)
