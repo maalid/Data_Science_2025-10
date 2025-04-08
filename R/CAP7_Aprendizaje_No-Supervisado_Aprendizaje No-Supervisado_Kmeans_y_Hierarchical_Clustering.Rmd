@@ -23,11 +23,12 @@ output:
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, echo = TRUE)
-knitr::opts_chunk$set(warning = FALSE)
+# knitr::opts_chunk$set(warning = FALSE)
 ```
 
 ```{r , include = FALSE}
 # load(file = "CAP6_Global_Environment.RData")
+library(magrittr)
 ```
 
 
@@ -229,10 +230,10 @@ Las debilidades de la agrupación en clústeres de `k-means` son las siguientes:
 Para implementar el algoritmo de `k-means` en `R` usaremos las  librerías `cluster` y `factoextra`. Adicionalmente, usaremos la base de datos `USArrests.csv`, que contiene estadísticas sobre arrestos (por cada 100000 residentes) por asalto, asesinato y violación en cada uno de los 50 estados de EE.UU. en 1973, e incluye el porcentaje de la población que vive en áreas urbanas.
 
 ```{r message=FALSE, warning=FALSE, paged.print=TRUE}
-library(cluster)
-library(factoextra)
+# library(cluster)
+# library(factoextra)
 
-USArrests_data <- read.csv("USArrests.csv", stringsAsFactors = FALSE)
+USArrests_data <- utils::read.csv("data/USArrests.csv", stringsAsFactors = FALSE)
 USArrests_data
 ```
 
@@ -248,14 +249,14 @@ USArrests_data
 Usamos la función `str()` para inspeccionar las variables y hacernos una idea de los tipos de datos y valores que contienen:
 
 ```{r}
-str(USArrests_data)
+utils::str(USArrests_data)
 ```
 
 Aparentemente las cuatro variables ccontienen datos "sanos", sin embargo, debemos trasnformarlas de modo que todas ellas estén en una escala equivalente. Para eso, usamos la función `scale()`, tal como se observa a continuación:
 
 ```{r}
 USArrests_scaled_data <- scale(USArrests_data, center = TRUE, scale = TRUE)
-head(USArrests_scaled_data)
+utils::head(USArrests_scaled_data)
 attributes(USArrests_scaled_data)[3:4]
 ```
 
@@ -264,11 +265,11 @@ Notar que la salida de la función `scale()` es una matriz que tiene dos atribut
 Una vez se tienen escaladas las variables, calculamos las distancias euclidianas entre ellas. Para esto, usamos la función `get_dist()` de la librería `factoextra`. Adicionalmente, mediante la función `fviz_dist()` de la misma librería podemos visualizar tales distancias, tal como se muestra a continuación:
 
 ```{r}
-distance <- get_dist(x = USArrests_scaled_data,
-                     method = "euclidean")
+distance <- factoextra::get_dist(x = USArrests_scaled_data,
+                                 method = "euclidean")
 
-fviz_dist(dist.obj = distance, 
-          gradient = list(low = "red", mid = "white", high = "blue"))
+factoextra::fviz_dist(dist.obj = distance, 
+                      gradient = list(low = "red", mid = "white", high = "blue"))
 ```
 
 En el gráfico anterior, el color azul representa distancias grandes entre pares de observaciones, mientras que el color rojo representa lo contrario. Así, por ejemplo, podría decirse que `Vermont` y `California` están muy alejados (son muy disimiles) por lo que debiesen estar en conglomerados distintos, mientras que `Illinois` con `New York` son muy similares (y debiesen estar dentro del mismo grupo) ya que la distancia entre ellos es muy pequeña.
@@ -276,10 +277,10 @@ En el gráfico anterior, el color azul representa distancias grandes entre pares
 Si bien la gráfica anterior nos permite observar la (di)similitud entre los distintas pares de observaciones, no es práctica para determinar fácilmente los grupos y sus elementos. Es por eso que es necesario ejecutar un algoritmo de agrupamiento. En efecto, usaremos la función `kmeans()` de la librería `stats`, inicialmente considerando dos centros (es decir, dos grupos) y 25 observaciones:
 
 ```{r}
-model_k2 <- kmeans(x = USArrests_scaled_data, 
-                   centers = 2, 
-                   nstart = 25)
-str(model_k2)
+model_k2 <- stats::kmeans(x = USArrests_scaled_data, 
+                          centers = 2, 
+                          nstart = 25)
+utils::str(model_k2)
 ```
 
 De la salida anterior se observa que el algoritmo genera una lista de 9 elementos, entre los cuales están:
@@ -301,8 +302,8 @@ model_k2
 Notar que, tal como se había previsto, `Vermont` y `California` quedaron en conglomerados distintos, mientras que `Illinois` y `New York` quedaron en el mismo. Para ver los grupos y sus elementos, podemos usar la función `fviz_cluster()` de la librería `factoextra`. En efecto:
 
 ```{r}
-fviz_cluster(object = model_k2, 
-             data = USArrests_scaled_data)
+factoextra::fviz_cluster(object = model_k2, 
+                         data = USArrests_scaled_data)
 ```
 
 Notar que los ejes no corresponden a ninguna de las variables originales (`Murder`, `Assault`, `UrbanPop`, `Rape`), si no que más bien a las dos componentes principales que explican la mayor cantidad de variavilidad en los datos (`fviz_cluster()` hace automáticcamente un análisis de PCA).
@@ -316,50 +317,50 @@ x <- data.frame(USArrests_scaled_data,
                 State = states_names,
                 cluster = model_k2$cluster)
 
-ggplot(data = x) +
-    aes(x = UrbanPop, y = Murder, color = factor(cluster), label = State) +
-    geom_text()
+ggplot2::ggplot(data = x) +
+    ggplot2::aes(x = UrbanPop, y = Murder, color = factor(cluster), label = State) +
+    ggplot2::geom_text()
 ```
 
 Debido a que el número de conglomerados `k` debe establecerse antes de iniciar el algoritmo, a menudo es ventajoso utilizar varios valores diferentes de `k` y examinar las diferencias en los resultados. Podemos ejecutar el mismo proceso para 3, 4 y 5 clústeres, y los resultados se muestran en la figura:
 
 ```{r}
-model_k3 <- kmeans(x = USArrests_scaled_data, 
-                   centers = 3, 
-                   nstart = 25)
+model_k3 <- stats::kmeans(x = USArrests_scaled_data, 
+                          centers = 3, 
+                          nstart = 25)
 
-model_k4 <- kmeans(x = USArrests_scaled_data, 
-                   centers = 4, 
-                   nstart = 25)
+model_k4 <- stats::kmeans(x = USArrests_scaled_data, 
+                          centers = 4, 
+                          nstart = 25)
 
-model_k5 <- kmeans(x = USArrests_scaled_data, 
-                   centers = 5, 
-                   nstart = 25)
+model_k5 <- stats::kmeans(x = USArrests_scaled_data, 
+                          centers = 5, 
+                          nstart = 25)
 
 # plots to compare
-p1 <- fviz_cluster(object = model_k2, 
-                   geom = "point", 
-                   data = USArrests_scaled_data) + 
-    ggtitle("k = 2")
+p1 <- factoextra::fviz_cluster(object = model_k2, 
+                               geom = "point", 
+                               data = USArrests_scaled_data) + 
+  ggplot2::ggtitle("k = 2")
 
-p2 <- fviz_cluster(object = model_k3, 
-                   geom = "point",  
-                   data = USArrests_scaled_data) + 
-    ggtitle("k = 3")
+p2 <- factoextra::fviz_cluster(object = model_k3, 
+                               geom = "point",  
+                               data = USArrests_scaled_data) + 
+  ggplot2::ggtitle("k = 3")
 
-p3 <- fviz_cluster(object = model_k4, 
-                   geom = "point",  
-                   data = USArrests_scaled_data) + 
-    ggtitle("k = 4")
+p3 <- factoextra::fviz_cluster(object = model_k4, 
+                               geom = "point",  
+                               data = USArrests_scaled_data) + 
+  ggplot2::ggtitle("k = 4")
 
-p4 <- fviz_cluster(object = model_k5, 
-                   geom = "point",  
-                   data = USArrests_scaled_data) + 
-    ggtitle("k = 5")
+p4 <- factoextra::fviz_cluster(object = model_k5, 
+                               geom = "point",  
+                               data = USArrests_scaled_data) + 
+  ggplot2::ggtitle("k = 5")
 
-library(gridExtra)
-grid.arrange(p1, p2, p3, p4, 
-             nrow = 2)
+# library(gridExtra)
+gridExtra::grid.arrange(p1, p2, p3, p4, 
+                        nrow = 2)
 ```
 
 Aunque esta evaluación visual nos dice dónde ocurren las diluciones verdaderas (o no ocurren, como los grupos 2 y 4 en el gráfico `k = 5`) entre grupos, no nos dice cuál es el número óptimo de grupos. 
@@ -369,31 +370,31 @@ A continuación usaremos los tres métodos descritos anteriormente para encontra
 ```{r}
 set.seed(135)
 
-fviz_nbclust(x = USArrests_scaled_data, 
-             FUNcluster = kmeans, 
-             method = "wss")
+factoextra::fviz_nbclust(x = USArrests_scaled_data, 
+                         FUNcluster = kmeans, 
+                         method = "wss")
 ```
 
 De la gráfica anterior se puede observar que el valor para `k` óptimo es 4 o 6. Veamos que obtenemos usando el método de la silueta:
 
 ```{r}
-fviz_nbclust(x = USArrests_scaled_data, 
-             FUNcluster = kmeans, 
-             method = "silhouette")
+factoextra::fviz_nbclust(x = USArrests_scaled_data, 
+                         FUNcluster = kmeans, 
+                         method = "silhouette")
 ```
 
 Aquí obtenemos que el número óptimo de clusters debería ser 2. Probemos ahora usando el método del _Gap Statistics_. Para esto, usamos la funcción `clusGap()` de la librería `cluster`, considerando 50 datasets de referencia y como máximo 10 conglomerados:
 
 ```{r}
 set.seed(123)
-gap_stat <- clusGap(x = USArrests_scaled_data, 
-                    FUNcluster = kmeans, 
-                    nstart = 25,
-                    K.max = 10, 
-                    B = 50)
+gap_stat <- cluster::clusGap(x = USArrests_scaled_data, 
+                             FUNcluster = kmeans, 
+                             nstart = 25,
+                             K.max = 10, 
+                             B = 50)
 
 print(gap_stat, method = "firstmax")
-fviz_gap_stat(gap_stat, maxSE = list(method = "firstmax", SE.factor = 1))
+factoextra::fviz_gap_stat(gap_stat, maxSE = list(method = "firstmax", SE.factor = 1))
 ```
 
 Este método nos dice que el número óptimo de grupos debe ser `k = 4`. En consecuencia, generamos el modelo óptimo usando este valor:
@@ -401,15 +402,15 @@ Este método nos dice que el número óptimo de grupos debe ser `k = 4`. En cons
 ```{r}
 # Compute k-means clustering with k = 4
 set.seed(123)
-best_model <- kmeans(USArrests_scaled_data, centers = 4, nstart = 25)
+best_model <- stats::kmeans(USArrests_scaled_data, centers = 4, nstart = 25)
 print(best_model)
 ```
 
 Una visualización de este agrupamiento final (y las observaciones en cada grupo), se muestra a continuación:
 
 ```{r}
-fviz_cluster(object = best_model, 
-             data = USArrests_scaled_data)
+factoextra::fviz_cluster(object = best_model, 
+                         data = USArrests_scaled_data)
 ```
 
 Finalmente, agregamos la asignación de cada grupo al dataframe original y graficamos los perfiles de densidad para cada una de las variables, agrupadas por el cluster al que pertenecen las observaciones:
@@ -418,26 +419,26 @@ Finalmente, agregamos la asignación de cada grupo al dataframe original y grafi
 USArrests_data$Cluster <- as.factor(best_model$cluster)
 USArrests_data
 
-ggplot(data = USArrests_data) + 
-  aes(x = Murder, color = Cluster, fill = Cluster) + 
-  geom_density(alpha = 0.3) + 
-  theme_light()
+ggplot2::ggplot(data = USArrests_data) + 
+  ggplot2::aes(x = Murder, color = Cluster, fill = Cluster) + 
+  ggplot2::geom_density(alpha = 0.3) + 
+  ggplot2::theme_light()
 
-ggplot(data = USArrests_data) + 
-  aes(x = Assault, color = Cluster, fill = Cluster) + 
-  geom_density(alpha = 0.3) + 
-  theme_light()
+ggplot2::ggplot(data = USArrests_data) + 
+  ggplot2::aes(x = Assault, color = Cluster, fill = Cluster) + 
+  ggplot2::geom_density(alpha = 0.3) + 
+  ggplot2::theme_light()
 
-ggplot(data = USArrests_data) + 
-  aes(x = UrbanPop, color = Cluster, fill = Cluster) + 
-  geom_density(alpha = 0.3) + 
-  theme_light()
+ggplot2::ggplot(data = USArrests_data) + 
+  ggplot2::aes(x = UrbanPop, color = Cluster, fill = Cluster) + 
+  ggplot2::geom_density(alpha = 0.3) + 
+  ggplot2::theme_light()
 
-ggplot(data = USArrests_data) + 
-  aes(x = Rape, color = Cluster, fill = Cluster) + 
-  geom_density(alpha = 0.3) + 
-  theme_light()
-  
+ggplot2::ggplot(data = USArrests_data) + 
+  ggplot2::aes(x = Rape, color = Cluster, fill = Cluster) + 
+  ggplot2::geom_density(alpha = 0.3) + 
+  ggplot2::theme_light()
+
 ```
 
 Si filtramos por cada uno de los grupos, podemos obtener sus medidas de tendencia central usando la función `summary()`, de modo de poder interpretar cuantitativamente las similitudes de cada observación en cada grupo, y las diferencias entre grupos respecto a las variables consideradas en el análisis:
@@ -548,10 +549,10 @@ Las debilidades de la agrupación jerárquica son las siguientes:
 Para implementar el algoritmo de agrupación jerárquica en `R` usaremos las  librerías `cluster` y `factoextra`. Adicionalmente, usaremos la base de datos `USArrests.csv`, que contiene estadísticas sobre arrestos (por cada 100000 residentes) por asalto, asesinato y violación en cada uno de los 50 estados de EE.UU. en 1973, e incluye el porcentaje de la población que vive en áreas urbanas.
 
 ```{r message=FALSE, warning=FALSE, paged.print=TRUE}
-library(cluster)
-library(factoextra)
+# library(cluster)
+# library(factoextra)
 
-USArrests_data <- read.csv("USArrests.csv", stringsAsFactors = FALSE)
+USArrests_data <- utils::read.csv("data/USArrests.csv", stringsAsFactors = FALSE)
 USArrests_data
 ```
 
@@ -575,24 +576,24 @@ Para realizar agrupación jerárquica aglomerativa con `hclust()` primero escala
 USArrests_scaled_data <- scale(USArrests_data, center = TRUE, scale = TRUE)
 
 # Matriz de Disimilaridad
-distance <- get_dist(x = USArrests_scaled_data,
-                     method = "euclidean")
+distance <- factoextra::get_dist(x = USArrests_scaled_data,
+                                 method = "euclidean")
 
 # clustering jerarquico usando Complete Linkage
-hc_model_complete <- hclust(d = distance, 
-                            method = "complete")
+hc_model_complete <- stats::hclust(d = distance, 
+                                   method = "complete")
 
 # clustering jerarquico usando average Linkage
-hc_model_average <- hclust(d = distance, 
-                           method = "average")
+hc_model_average <- stats::hclust(d = distance, 
+                                  method = "average")
 
 # clustering jerarquico usando single Linkage
-hc_model_single <- hclust(d = distance, 
-                          method = "single")
+hc_model_single <- stats::hclust(d = distance, 
+                                 method = "single")
 
 # clustering jerarquico usando ward Linkage
-hc_model_ward <- hclust(d = distance, 
-                        method = "ward.D")
+hc_model_ward <- stats::hclust(d = distance, 
+                               method = "ward.D")
 
 # Graficas de los dendrogramaas
 plot(hc_model_complete, cex = 0.6, hang = -1)
@@ -606,21 +607,21 @@ Luego de observar los dendogramas, queda la pregunta sobre cuál método es el m
 
 ```{r}
 
-ag_model_average <- agnes(x = USArrests_scaled_data,
-                          metric = "euclidean",
-                          method = "average")
+ag_model_average <- cluster::agnes(x = USArrests_scaled_data,
+                                   metric = "euclidean",
+                                   method = "average")
 
-ag_model_single <- agnes(x = USArrests_scaled_data,
-                         metric = "euclidean",
-                         method = "single")
+ag_model_single <- cluster::agnes(x = USArrests_scaled_data,
+                                  metric = "euclidean",
+                                  method = "single")
 
-ag_model_complete <- agnes(x = USArrests_scaled_data,
-                           metric = "euclidean",
-                           method = "complete")
+ag_model_complete <- cluster::agnes(x = USArrests_scaled_data,
+                                    metric = "euclidean",
+                                    method = "complete")
 
-ag_model_ward <- agnes(x = USArrests_scaled_data,
-                       metric = "euclidean",
-                       method = "ward")
+ag_model_ward <- cluster::agnes(x = USArrests_scaled_data,
+                                metric = "euclidean",
+                                method = "ward")
 
 ac_df <- data.frame(average = ag_model_average$ac,
                     single = ag_model_single$ac,
@@ -639,31 +640,31 @@ La altura del corte al dendrograma controla el número de racimos obtenidos, y r
 
 ```{r}
 # Método del codo
-fviz_nbclust(x = USArrests_scaled_data, 
-             FUNcluster = hcut, 
-             method = "wss")
+factoextra::fviz_nbclust(x = USArrests_scaled_data, 
+                         FUNcluster = factoextra::hcut, 
+                         method = "wss")
 
 # Método de la silueta
-fviz_nbclust(x = USArrests_scaled_data, 
-             FUNcluster = hcut, 
-             method = "silhouette")
+factoextra::fviz_nbclust(x = USArrests_scaled_data, 
+                         FUNcluster = factoextra::hcut, 
+                         method = "silhouette")
 
 # Método de Gap
-gap_stat <- clusGap(x = USArrests_scaled_data, 
-                    FUNcluster = hcut, 
-                    nstart = 25, 
-                    K.max = 10, 
-                    B = 50)
+gap_stat <- cluster::clusGap(x = USArrests_scaled_data, 
+                             FUNcluster = factoextra::hcut, 
+                             nstart = 25, 
+                             K.max = 10, 
+                             B = 50)
 print(gap_stat, method = "firstmax")
-fviz_gap_stat(gap_stat, maxSE = list(method = "firstmax", SE.factor = 1))
+factoextra::fviz_gap_stat(gap_stat, maxSE = list(method = "firstmax", SE.factor = 1))
 ```
 
 Del análisis anterior, concluímos que el número óptimo es 4. Luego, para identificar subgrupos (es decir, clusters), podemos cortar el dendrograma con `cutree()`:
 
 ```{r}
 # Cortamos el arbol en 4 grupos
-sub_grp <- cutree(tree = hc_model_ward, 
-                  k = 4)
+sub_grp <- stats::cutree(tree = hc_model_ward, 
+                         k = 4)
 
 # Numero de observacciones en cada grupo
 table(sub_grp)
@@ -673,13 +674,13 @@ Es posible dibujar el dendrograma con un borde alrededor de los 4 grupos. El arg
 
 ```{r}
 plot(hc_model_ward, cex = 0.6)
-rect.hclust(hc_model_ward, k = 4, border = 2:5)
+stats::rect.hclust(hc_model_ward, k = 4, border = 2:5)
 ```
 
 Al igual que lo realizado para con el modelo `k-means`, podemos usar la función `fviz_cluster()` de la librería `factoextra` para visualizar el resultado en un diagrama de dispersión:
 
 ```{r}
-fviz_cluster(list(data = USArrests_scaled_data, cluster = sub_grp))
+factoextra::fviz_cluster(list(data = USArrests_scaled_data, cluster = sub_grp))
 ```
 
 Finalmente, agregamos la asignación de cada grupo al dataframe original y graficamos los perfiles de densidad para cada una de las variables, agrupadas por el cluster al que pertenecen las observaciones:
@@ -688,25 +689,25 @@ Finalmente, agregamos la asignación de cada grupo al dataframe original y grafi
 USArrests_data$Cluster_hc <- as.factor(sub_grp)
 USArrests_data
 
-ggplot(data = USArrests_data) + 
-  aes(x = Murder, color = Cluster_hc, fill = Cluster_hc) + 
-  geom_density(alpha = 0.3) + 
-  theme_light()
+ggplot2::ggplot(data = USArrests_data) + 
+  ggplot2::aes(x = Murder, color = Cluster_hc, fill = Cluster_hc) + 
+  ggplot2::geom_density(alpha = 0.3) + 
+  ggplot2::theme_light()
 
-ggplot(data = USArrests_data) + 
-  aes(x = Assault, color = Cluster_hc, fill = Cluster_hc) + 
-  geom_density(alpha = 0.3) + 
-  theme_light()
+ggplot2::ggplot(data = USArrests_data) + 
+  ggplot2::aes(x = Assault, color = Cluster_hc, fill = Cluster_hc) + 
+  ggplot2::geom_density(alpha = 0.3) + 
+  ggplot2::theme_light()
 
-ggplot(data = USArrests_data) + 
-  aes(x = UrbanPop, color = Cluster_hc, fill = Cluster_hc) + 
-  geom_density(alpha = 0.3) + 
-  theme_light()
+ggplot2::ggplot(data = USArrests_data) + 
+  ggplot2::aes(x = UrbanPop, color = Cluster_hc, fill = Cluster_hc) + 
+  ggplot2::geom_density(alpha = 0.3) + 
+  ggplot2::theme_light()
 
-ggplot(data = USArrests_data) + 
-  aes(x = Rape, color = Cluster_hc, fill = Cluster_hc) + 
-  geom_density(alpha = 0.3) + 
-  theme_light()
+ggplot2::ggplot(data = USArrests_data) + 
+  ggplot2::aes(x = Rape, color = Cluster_hc, fill = Cluster_hc) + 
+  ggplot2::geom_density(alpha = 0.3) + 
+  ggplot2::theme_light()
 ```
 
 Si filtramos por cada uno de los grupos, podemos obtener sus medidas de tendencia central usando la función `summary()`, de modo de poder interpretar cuantitativamente las similitudes de cada observación en cada grupo, y las diferencias entre grupos respecto a las variables consideradas en el análisis:
@@ -733,14 +734,14 @@ Por otro lado, la función `diana()` proporcionada por la librería `cluster` pe
 
 ```{r}
 # Agrupación jerárquica divisiva
-diana_model <- diana(x = USArrests_scaled_data,
-                     metric = "euclidean")
+diana_model <- cluster::diana(x = USArrests_scaled_data,
+                              metric = "euclidean")
 
 # Coeficiente de división: cantidad de estructura de agrupamiento encontrada
 diana_model$dc
 
 # Dendrogram
-pltree(diana_model, cex = 0.6, hang = -1, main = "Dendrogram of diana")
+cluster::pltree(diana_model, cex = 0.6, hang = -1, main = "Dendrogram of diana")
 ```
 
 
@@ -748,20 +749,21 @@ Finalmente, para usar la función `cutree()` con `agnes()` y `diana()`, puede re
 
 ```{r}
 # Cut agnes() tree into 4 groups
-hc_model_agnes <- agnes(USArrests_scaled_data,
-                        method = "ward")
-sub_grp_agnes <- cutree(as.hclust(hc_model_agnes), 
-                        k = 4)
+hc_model_agnes <- cluster::agnes(USArrests_scaled_data,
+                                 method = "ward")
+sub_grp_agnes <- stats::cutree(stats::as.hclust(hc_model_agnes), 
+                               k = 4)
 table(sub_grp_agnes)
-plot(as.hclust(hc_model_agnes), cex = 0.6)
-rect.hclust(as.hclust(hc_model_agnes), k = 4, border = 2:5)
+plot(stats::as.hclust(hc_model_agnes), cex = 0.6)
+stats::rect.hclust(stats::as.hclust(hc_model_agnes), k = 4, border = 2:5)
 
 # Cut diana() tree into 4 groups
-hc_model_diana <- diana(USArrests_scaled_data)
-sub_grp_diana <- cutree(as.hclust(hc_model_diana), 
-                        k = 4)
+hc_model_diana <- cluster::diana(USArrests_scaled_data)
+sub_grp_diana <- stats::cutree(stats::as.hclust(hc_model_diana), 
+                               k = 4)
 table(sub_grp_diana)
-plot(as.hclust(hc_model_diana), cex = 0.6)
-rect.hclust(as.hclust(hc_model_diana), k = 4, border = 2:5)
+plot(stats::as.hclust(hc_model_diana), cex = 0.6)
+stats::rect.hclust(stats::as.hclust(hc_model_diana), k = 4, border = 2:5)
 ```
 
+</div>
