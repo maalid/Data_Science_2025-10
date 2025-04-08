@@ -15,8 +15,7 @@ output:
     df_print: paged
 ---
 
-<div style="text-align: justify">
-
+::::::::::::: {style="text-align: justify"}
 <br>
 
 <br>
@@ -79,13 +78,13 @@ Algunos de los roles recurrentes en un proyecto de ciencia de datos son los que 
 
 <br>
 
-|            Rol            |                                      Responsabilidades                                     |
-|:-------------------------:|:------------------------------------------------------------------------------------------:|
-| Patrocinador del proyecto |                 Representa los intereses comerciales; defiende el proyecto                 |
-|         El cliente        |           Representa los intereses de los usuarios finales; experto en en el tema          |
-|    Científico de datos    |  Establece y ejecuta la estrategia analítica; se comunica con el patrocinador y el cliente |
-|    Arquitecto de datos    | Gestiona los datos y el almacenamiento de datos; a veces gestiona la recopilación de datos |
-|        Operaciones        |         Gestiona la infraestructura; despliega los resultados finales del proyecto         |
+| Rol | Responsabilidades |
+|:----------------:|:----------------------------------------------------:|
+| Patrocinador del proyecto | Representa los intereses comerciales; defiende el proyecto |
+| El cliente | Representa los intereses de los usuarios finales; experto en en el tema |
+| Científico de datos | Establece y ejecuta la estrategia analítica; se comunica con el patrocinador y el cliente |
+| Arquitecto de datos | Gestiona los datos y el almacenamiento de datos; a veces gestiona la recopilación de datos |
+| Operaciones | Gestiona la infraestructura; despliega los resultados finales del proyecto |
 
 <br>
 
@@ -171,11 +170,7 @@ Un modelo común del proceso de aprendizaje automático es el proceso estándar 
 
 <br>
 
-<center>
-
-![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_1_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}
-
-</center>
+<center>![](C:/mii/Data_Science_2025-10/images/Figura_1_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}</center>
 
 <br>
 
@@ -226,28 +221,28 @@ En el ejemplo de solicitud de préstamo, imagine que ha recopilado una muestra d
 
 Los atributos/variables recopiladas sobre cada solicitud de préstamo son los siguientes:
 
-1.  **Status\_of\_existing\_checking\_account** (al momento de solicitud).
-2.  **Duration\_in\_month** (duración del préstamo).
-3.  **Credit\_history**.
+1.  **Status_of_existing_checking_account** (al momento de solicitud).
+2.  **Duration_in_month** (duración del préstamo).
+3.  **Credit_history**.
 4.  **Purpose** (para comprar auto, pagar estudios, etc.).
-5.  **Credit\_amount** (monto del préstamo).
-6.  **Savings\_Account\_or\_bonds** (balance/monto).
-7.  **Present\_employment\_since**.
+5.  **Credit_amount** (monto del préstamo).
+6.  **Savings_Account_or_bonds** (balance/monto).
+7.  **Present_employment_since**.
 8.  **Income**.
-9.  **Personal\_status\_and\_sex**.
+9.  **Personal_status_and_sex**.
 10. **Cosigners**.
-11. **Present\_residence\_since**.
+11. **Present_residence_since**.
 12. **Collateral** (es dueño de un auto, una propiedad, etc.).
-13. **Age\_in\_years**.
-14. **Other\_installment\_plans** (otros créditos/líneas de crédito).
+13. **Age_in_years**.
+14. **Other_installment_plans** (otros créditos/líneas de crédito).
 15. **Housing** (dueño, arrienda, etc.).
-16. **Number\_of\_existing\_credits\_at\_this\_bank**.
+16. **Number_of_existing_credits_at_this_bank**.
 17. **Job** (tipo de empleo).
-18. **Number\_of\_dependents**.
+18. **Number_of_dependents**.
 19. **Telephone**.
-20. **Loan\_status** (variable dependiente).
+20. **Loan_status** (variable dependiente).
 
-La variable **Loan\_status** toma dos valores posibles: *GoodLoan* y *BadLoan*. Para los propósitos de esta discusión, suponga que un *GoodLoan* significa "crédito pagado" y un *BadLoan* "crédito no pagado".
+La variable **Loan_status** toma dos valores posibles: *GoodLoan* y *BadLoan*. Para los propósitos de esta discusión, suponga que un *GoodLoan* significa "crédito pagado" y un *BadLoan* "crédito no pagado".
 
 En la medida de lo posible, intente utilizar información que pueda medirse directamente, en lugar de información que se infiera de otra medición. Por ejemplo, puede tener la tentación de utilizar **Income** como variable, con el razonamiento de que un ingreso más bajo implica más dificultades para pagar un préstamo. Sin embargo, la capacidad de pagar un préstamo se mide de manera más directa considerando el monto de los pagos del préstamo en relación con los ingresos disponibles del solicitante. Esta información es más útil que los ingresos por sí solos.
 :::
@@ -259,11 +254,7 @@ Esta es la etapa en la que inicialmente explora y visualiza sus datos. También 
 <br>
 
 ::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
-<center>
-
-![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_2_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}
-
-</center>
+<center>![](C:/mii/Data_Science_2025-10/images/Figura_2_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}</center>
 
 <br>
 
@@ -300,11 +291,7 @@ Las tareas de modelado de ciencia de datos más comunes son las siguientes:
 <br>
 
 ::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
-<center>
-
-![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_3_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}
-
-</center>
+<center>![](images/Figura_1_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}</center>
 
 <br>
 
@@ -401,11 +388,7 @@ En el ejemplo de la solicitud de préstamo, lo más importante que debe presenta
 
 <br>
 
-<center>
-
-![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2025-10/images/Figura_4_Capitulo_1_El_Proceso_de_Data_Science.png){style="border-radius: 5px;" width="590"}
-
-</center>
+<center>![](C:/mii/Data_Science_2025-10/images/Figura_4_Capitulo_1_El_Proceso_de_Data_Science.png){style="border-radius: 5px;" width="590"}</center>
 
 <br>
 
@@ -465,3 +448,4 @@ En nuestro ejemplo de solicitud de préstamo, el 70% de las solicitudes de prés
 <br>
 
 ¿Cuánto mejor que el 70% debería ser? En estadística, existe un procedimiento llamado [**prueba de hipótesis**](https://es.wikipedia.org/wiki/Contraste_de_hip%C3%B3tesis), o prueba de significancia, que prueba si su modelo es equivalente a un modelo nulo (en nuestro caso, si un nuevo modelo es básicamente tan preciso como adivinar *GoodLoan* todo el tiempo).
+:::::::::::::
