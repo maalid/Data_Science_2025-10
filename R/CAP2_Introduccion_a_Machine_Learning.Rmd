@@ -75,7 +75,7 @@ El campo de estudio interesado en el desarrollo de algoritmos informáticos para
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_1_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_1_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
@@ -105,7 +105,7 @@ El sentido del olfato del perro puede ser muchas veces más fuerte que el de su 
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_2_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_2_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
@@ -139,7 +139,7 @@ El aprendizaje automático tiene más éxito cuando aumenta, en lugar de reempla
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_3_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_3_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
@@ -157,7 +157,7 @@ Además, las computadoras tienen una capacidad limitada para hacer inferencias s
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_4_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_4_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
@@ -207,7 +207,7 @@ El proceso de aprendizaje básico se puede dividir en cuatro componentes interre
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_5_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_5_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
@@ -263,7 +263,7 @@ Es importante tener en cuenta que un modelo aprendido no proporciona por sí mis
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_6_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_6_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
@@ -287,7 +287,7 @@ Las heurísticas empleadas por los algoritmos de aprendizaje automático tambié
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_7_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_7_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
@@ -331,7 +331,7 @@ Tratar de modelar el ruido es la base de un problema llamado **sobreajuste**.
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_8_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_8_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
@@ -371,7 +371,7 @@ Los conjuntos de datos que almacenan las unidades de observación y sus propieda
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_9_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="550"}
+![](images/Figura_9_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="550"}
 
 </center>
 
@@ -401,7 +401,7 @@ Un modelo predictivo se usa para tareas que involucran, como su nombre lo indica
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_10_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_10_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
@@ -415,8 +415,10 @@ Para comenzar a aplicar el aprendizaje automático a un proyecto del mundo real,
 
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_11_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
+![](images/Figura_11_Capitulo_2_Introduccion_a_Machine_Learning.png){style="border-radius: 5px;" width="450"}
 
 </center>
 
 <br>
+
+</div>

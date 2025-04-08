@@ -497,7 +497,7 @@ En la siguiente figura se muestra una representación de los algoritmos descrito
 <br>
 <center>
 
-![](images/Figura_1_Capitulo_7_Aprendizaje_No_Supervisado_k-means_y_Agrupamiento_Jerarquico.png "")
+![](images/Figura_1_Capitulo_7_Aprendizaje_No_Supervisado_k-means_y_Agrupamiento_Jerarquico.png){style="border-radius: 5px;" width="450"}
 
 </center>
 <br>
@@ -524,7 +524,7 @@ En la siguiente figura se muestra una representación de los métodos descritos 
 <br>
 <center>
 
-![](images/Figura_2_Capitulo_7_Aprendizaje_No_Supervisado_k-means_y_Agrupamiento_Jerarquico.jpg "")
+![](images/Figura_2_Capitulo_7_Aprendizaje_No_Supervisado_k-means_y_Agrupamiento_Jerarquico.jpg){style="border-radius: 5px;" width="450"}
 
 </center>
 <br>

@@ -170,7 +170,7 @@ Un modelo común del proceso de aprendizaje automático es el proceso estándar 
 
 <br>
 
-<center>![](C:/mii/Data_Science_2025-10/images/Figura_1_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}</center>
+<center>![](images/Figura_1_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}</center>
 
 <br>
 
@@ -254,7 +254,7 @@ Esta es la etapa en la que inicialmente explora y visualiza sus datos. También 
 <br>
 
 ::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
-<center>![](C:/mii/Data_Science_2025-10/images/Figura_2_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}</center>
+<center>![](images/Figura_2_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}</center>
 
 <br>
 
@@ -291,7 +291,7 @@ Las tareas de modelado de ciencia de datos más comunes son las siguientes:
 <br>
 
 ::: {style="background-color: LightGray; padding: 20px; border-radius: 25px; opacity: 0.8"}
-<center>![](images/Figura_1_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}</center>
+<center>![](images/Figura_3_Capitulo_1_El_Proceso_de_Data_Science.jpg){style="border-radius: 5px;"}</center>
 
 <br>
 
@@ -388,7 +388,7 @@ En el ejemplo de la solicitud de préstamo, lo más importante que debe presenta
 
 <br>
 
-<center>![](C:/mii/Data_Science_2025-10/images/Figura_4_Capitulo_1_El_Proceso_de_Data_Science.png){style="border-radius: 5px;" width="590"}</center>
+<center>![](images/Figura_4_Capitulo_1_El_Proceso_de_Data_Science.png){style="border-radius: 5px;" width="590"}</center>
 
 <br>
 

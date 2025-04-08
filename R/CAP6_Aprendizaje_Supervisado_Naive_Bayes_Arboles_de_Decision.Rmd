@@ -574,7 +574,7 @@ En efecto, considere un problema de regresión con variable respuesta continua $
 <br>
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_2_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.png "")
+![](images/Figura_2_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.png){style="border-radius: 5px;" width="450"}
 
 </center>
 <br>
@@ -849,7 +849,7 @@ La siguiente figura ilustra algunos ejemplos para entender el funcionamiento de 
 <br>
 <center>
 
-![](C:/mii/Data_Science_2025-10/images/Figura_3_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.jpg "")
+![](images/Figura_3_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.jpg){style="border-radius: 5px;" width="450"}
 
 </center>
 <br>
