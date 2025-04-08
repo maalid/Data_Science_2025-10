@@ -23,7 +23,6 @@ output:
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(warning = FALSE, echo = TRUE)
-knitr::opts_chunk$set(warning = FALSE)
 ```
 
 ```{r , include = FALSE}
@@ -138,7 +137,7 @@ de modo que solo es necesario calcular $m \times p$ probabilidades (esto equival
 Volvamos al ejemplo de determinar si un trabajador deja o no la empresa. Considere la siguiente tabla, que contiene los datos históricos de 1470 trabajadores:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-attrition_data <- readr::read_csv(here::here('data/WA_Fn-UseC_-HR-Employee-Attrition.csv'))
+attrition_data <- readr::read_csv('data/WA_Fn-UseC_-HR-Employee-Attrition.csv')
 
 attrition_data_simplified <- attrition_data %>% 
   dplyr::select(Attrition, Education, EnvironmentSatisfaction, JobInvolvement, 
@@ -170,10 +169,10 @@ Para usar la expresión del clasificador simplificado de Bayes es necesario obte
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 attrition_freq_table <- attrition_data_simplified %>% 
-    select(Attrition) %>% 
-    count(Attrition) %>% 
-    group_by(Attrition) %>% 
-    mutate(prop = n/nrow(attrition_data))
+    dplyr::select(Attrition) %>% 
+    dplyr::count(Attrition) %>% 
+    dplyr::group_by(Attrition) %>% 
+    dplyr::mutate(prop = n/nrow(attrition_data))
 attrition_freq_table
 ```
 
@@ -183,10 +182,10 @@ attrition_freq_table
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 education_freq_table <- attrition_data_simplified %>% 
-    select(Attrition, Education) %>% 
-    count(Attrition, Education) %>% 
-    group_by(Attrition) %>% 
-    mutate(prop = prop.table(n))
+    dplyr::select(Attrition, Education) %>% 
+    dplyr::count(Attrition, Education) %>% 
+    dplyr::group_by(Attrition) %>% 
+    dplyr::mutate(prop = prop.table(n))
 education_freq_table
 ```
 
@@ -196,10 +195,10 @@ education_freq_table
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 EnvironmentSatisfaction_freq_table <- attrition_data_simplified %>% 
-    select(Attrition, EnvironmentSatisfaction) %>% 
-    count(Attrition, EnvironmentSatisfaction) %>% 
-    group_by(Attrition) %>% 
-    mutate(prop = prop.table(n))
+    dplyr::select(Attrition, EnvironmentSatisfaction) %>% 
+    dplyr::count(Attrition, EnvironmentSatisfaction) %>% 
+    dplyr::group_by(Attrition) %>% 
+    dplyr::mutate(prop = prop.table(n))
 EnvironmentSatisfaction_freq_table
 ```
 
@@ -209,10 +208,10 @@ EnvironmentSatisfaction_freq_table
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 JobInvolvement_freq_table <- attrition_data_simplified %>% 
-    select(Attrition, JobInvolvement) %>% 
-    count(Attrition, JobInvolvement) %>% 
-    group_by(Attrition) %>% 
-    mutate(prop = prop.table(n))
+    dplyr::select(Attrition, JobInvolvement) %>% 
+    dplyr::count(Attrition, JobInvolvement) %>% 
+    dplyr::group_by(Attrition) %>% 
+    dplyr::mutate(prop = prop.table(n))
 JobInvolvement_freq_table
 ```
 
@@ -222,10 +221,10 @@ JobInvolvement_freq_table
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 JobSatisfaction_freq_table <- attrition_data_simplified %>% 
-    select(Attrition, JobSatisfaction) %>% 
-    count(Attrition, JobSatisfaction) %>% 
-    group_by(Attrition) %>% 
-    mutate(prop = prop.table(n))
+    dplyr::select(Attrition, JobSatisfaction) %>% 
+    dplyr::count(Attrition, JobSatisfaction) %>% 
+    dplyr::group_by(Attrition) %>% 
+    dplyr::mutate(prop = prop.table(n))
 JobSatisfaction_freq_table
 ```
 
@@ -235,10 +234,10 @@ JobSatisfaction_freq_table
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 PerformanceRating_freq_table <- attrition_data_simplified %>% 
-    select(Attrition, PerformanceRating) %>% 
-    count(Attrition, PerformanceRating) %>% 
-    group_by(Attrition) %>% 
-    mutate(prop = prop.table(n))
+    dplyr::select(Attrition, PerformanceRating) %>% 
+    dplyr::count(Attrition, PerformanceRating) %>% 
+    dplyr::group_by(Attrition) %>% 
+    dplyr::mutate(prop = prop.table(n))
 PerformanceRating_freq_table
 ```
 
@@ -248,10 +247,10 @@ PerformanceRating_freq_table
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 RelationshipSatisfaction_freq_table <- attrition_data_simplified %>% 
-    select(Attrition, RelationshipSatisfaction) %>% 
-    count(Attrition, RelationshipSatisfaction) %>% 
-    group_by(Attrition) %>% 
-    mutate(prop = prop.table(n))
+    dplyr::select(Attrition, RelationshipSatisfaction) %>% 
+    dplyr::count(Attrition, RelationshipSatisfaction) %>% 
+    dplyr::group_by(Attrition) %>% 
+    dplyr::mutate(prop = prop.table(n))
 RelationshipSatisfaction_freq_table
 ```
 
@@ -261,10 +260,10 @@ RelationshipSatisfaction_freq_table
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
 WorkLifeBalance_freq_table <- attrition_data_simplified %>% 
-    select(Attrition, WorkLifeBalance) %>% 
-    count(Attrition, WorkLifeBalance) %>% 
-    group_by(Attrition) %>% 
-    mutate(prop = prop.table(n))
+    dplyr::select(Attrition, WorkLifeBalance) %>% 
+    dplyr::count(Attrition, WorkLifeBalance) %>% 
+    dplyr::group_by(Attrition) %>% 
+    dplyr::mutate(prop = prop.table(n))
 WorkLifeBalance_freq_table
 ```
 
@@ -322,18 +321,14 @@ Usaremos la librería [`caret`](http://topepo.github.io/caret/index.html), la cu
 Primero, cargaremos las librerías, y leeremos la base de datos `"WA_Fn-UseC_-HR-Employee-Attrition.csv"`, asignándola al objeto `data_attrition`. En efecto:
 
 ```{r message=FALSE, warning=FALSE, paged.print=TRUE}
-library(rsample)
-library(caret)
-library(corrplot)
-
-data_attrition <- read.csv("WA_Fn-UseC_-HR-Employee-Attrition.csv", stringsAsFactors = FALSE)
+data_attrition <- utils::read.csv("data/WA_Fn-UseC_-HR-Employee-Attrition.csv", stringsAsFactors = FALSE)
 data_attrition
 ```
 
 Inspeccionamos el dataframe anterior para revisar los tipos de datos y los valores que contienen cada una de las variables.
 
 ```{r}
-str(data_attrition)
+utils::str(data_attrition)
 ```
 
 
@@ -401,10 +396,10 @@ Luego, creamos los conjuntos de entrenamiento, `train`, y validación, `validati
 
 ```{r}
 set.seed(123)
-split <- initial_split(data_attrition_2, prop = 0.7, strata = "Attrition")
-train <- training(split)
+split <- rsample::initial_split(data_attrition_2, prop = 0.7, strata = "Attrition")
+train <- rsample::training(split)
 train
-validation <- testing(split)
+validation <- rsample::testing(split)
 validation
 ```
 
@@ -428,11 +423,11 @@ train_Attrition_Yes <- train[train$Attrition == "yes", -9]
 train_Attrition_Yes_numeric <- Filter(is.numeric, train_Attrition_Yes)
 
 # Calculamos las correlaciones
-cor_train_Attrition_Yes_numeric <- cor(train_Attrition_Yes_numeric)
+cor_train_Attrition_Yes_numeric <- stats::cor(train_Attrition_Yes_numeric)
 cor_train_Attrition_Yes_numeric
 
 # Graficamos la matriz anterior para visualizar de mejor manera
-corrplot(cor_train_Attrition_Yes_numeric)
+corrplot::corrplot(cor_train_Attrition_Yes_numeric)
 ```
 
 Del gráfico anterior es claro que la independencia no se cumple ya que hay varias variables altamente correlacionadas. A pesar de esto, continuaremos con el objetivo de generar un predictor ingenuo de Bayes.
@@ -440,29 +435,29 @@ Del gráfico anterior es claro que la independencia no se cumple ya que hay vari
 Por otro lado, si graficamos los perfiles de las distribuciones de (algunas) las variables numéricas, vemos que tampoco se cumple el supuesto de normalidad. En efecto:
 
 ```{r}
-ggplot(data = train) +
-  aes(x = Age) +
-  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+ggplot2::ggplot(data = train) +
+  ggplot2::aes(x = Age) +
+  ggplot2::geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
 
-ggplot(data = train) +
-  aes(x = DailyRate) +
-  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+ggplot2::ggplot(data = train) +
+  ggplot2::aes(x = DailyRate) +
+  ggplot2::geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
 
-ggplot(data = train) +
-  aes(x = DistanceFromHome) +
-  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+ggplot2::ggplot(data = train) +
+  ggplot2::aes(x = DistanceFromHome) +
+  ggplot2::geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
 
-ggplot(data = train) +
-  aes(x = HourlyRate) +
-  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+ggplot2::ggplot(data = train) +
+  ggplot2::aes(x = HourlyRate) +
+  ggplot2::geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
 
-ggplot(data = train) +
-  aes(x = MonthlyIncome) +
-  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+ggplot2::ggplot(data = train) +
+  ggplot2::aes(x = MonthlyIncome) +
+  ggplot2::geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
 
-ggplot(data = train) +
-  aes(x = MonthlyRate) +
-  geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
+ggplot2::ggplot(data = train) +
+  ggplot2::aes(x = MonthlyRate) +
+  ggplot2::geom_density(fill = "#69b3a2", color = "#e9ecef", alpha = 0.8)
 ```
 
 Esto no será un problema, ya que como veremos más adelante, usaremos distintos métodos para obtener las probabilidades a partir de sus funciones de distribución de probabilidad.
@@ -477,17 +472,17 @@ x <- train[ , features]
 y <- train$Attrition
 
 # 2. Fijamos el número de folds para realizar cross-validation
-train_control <- trainControl(method = "cv", 
-                              number = 10)
+train_control <- caret::trainControl(method = "cv", 
+                                     number = 10)
 
 # 3. Entrenamos el modelo naive Bayes usando lo anterior
-nb_model_1 <- train(x = x,
-                    y = y,
-                    method = "nb",
-                    trControl = train_control)
+nb_model_1 <- caret::train(x = x,
+                           y = y,
+                           method = "nb",
+                           trControl = train_control)
 
 # 4. Evaluamos los resultados del entrenamiento
-confusionMatrix(nb_model_1)
+caret::confusionMatrix(nb_model_1)
 ```
 
 Notar que el modelo obtiene un accuracy de $83.2\%$. Teniendo en cuenta que alrededor del $83\%$ de las observaciones en el conjunto de entrenamiento corresponden a `no`, el accuracy general del modelo recién entrenado no es mejor que si solo pronosticamos "no" para cada observación.
@@ -508,11 +503,11 @@ search_grid <- expand.grid(usekernel = c(TRUE, FALSE),
                            adjust = seq(0, 4, by = 1))
 
 # 2. Entrenamos el modelo naive Bayes usando la grilla anterior
-nb_model_2 <- train(x = x,
-                    y = y,
-                    method = "nb",
-                    trControl = train_control,
-                    tuneGrid = search_grid)
+nb_model_2 <- caret::train(x = x,
+                           y = y,
+                           method = "nb",
+                           trControl = train_control,
+                           tuneGrid = search_grid)
 
 # 3. Ordenamos para ver los top models (interesan aquellos con accuracy mayor que 83%)
 nb_model_2_results <- nb_model_2$results[]
@@ -524,7 +519,7 @@ nb_model_2_results_best_ordered
 plot(nb_model_2)
 
 # 5. Evaluamos el mejor modelo
-confusionMatrix(nb_model_2)
+caret::confusionMatrix(nb_model_2)
 ```
 
 De la gráfica anterior observamos que el mejor modelo se obtuvo para `usekernel = TRUE`, `fl = 1` y `adjust = 4`. El accuracy alcanzado es de $85.24\%$, aunque ahora el modelo se equivoca un poco más al predecir correctamente la clase `yes`.
@@ -534,12 +529,12 @@ Una segunda opción de mejora que se puede explorar es realizar un preprocesamie
 ```{r}
 set.seed(999)
 # 1. Entrenamos el modelo naive Bayes considerando preprocesamiento de las variables
-nb_model_3 <- train(x = x,
-                    y = y,
-                    method = "nb",
-                    trControl = train_control,
-                    tuneGrid = search_grid,
-                    preProc = c("BoxCox", "center", "scale", "pca"))
+nb_model_3 <- caret::train(x = x,
+                           y = y,
+                           method = "nb",
+                           trControl = train_control,
+                           tuneGrid = search_grid,
+                           preProc = c("BoxCox", "center", "scale", "pca"))
 
 # 2. Ordenamos para ver los top models (interesan aquellos con accuracy mayor que 83%)
 nb_model_3_results <- nb_model_3$results[]
@@ -551,7 +546,7 @@ nb_model_3_results_best_ordered
 plot(nb_model_3)
 
 # 4. Evaluamos el mejor modelo
-confusionMatrix(nb_model_3)
+caret::confusionMatrix(nb_model_3)
 ```
 
 Vemos que con el preprocesamiento el accuracy aumenta un punto porcentual más, es decir, el mejor modelo ahora corresponde a `usekernel = TRUE`, `fl = 1` y `adjust = 1`, logrando un $86.12\%$ de correcta clasificación global. Sin embargo, este modelo predice la clase `no` levente peor que el anterior.
@@ -559,8 +554,8 @@ Vemos que con el preprocesamiento el accuracy aumenta un punto porcentual más, 
 Asumiendo que aceptamos el último modelo, podemos finalmente pasar a la fase de inferencia (predecir sobre datos nuevos). Usaremos el conjunto de datos de validación para realizar las predicciones. En efecto:
 
 ```{r}
-pred <- predict(nb_model_3, newdata = validation)
-confusionMatrix(pred, validation$Attrition)
+pred <- stats::predict(nb_model_3, newdata = validation)
+caret::confusionMatrix(pred, validation$Attrition)
 ```
 
 De la tabla anterior vemos que el modelo predice con un accuracy global del $84.32\%$, algo menor que lo que se obtuvo sobre los datos de entrenamiento (esto es esperable que suceda). Sin embargo, al observar la métrica de especificidad, vemos que el modelo no logra reconocer muy bien la clase negativa (es decir, cuando un trabajador renuncia; `Attrition = yes`). Esta baja capacidad en detectar esta clase se debe principalmente al [problema de imbalance de clases](https://medium.com/quantyca/how-to-handle-class-imbalance-problem-9ee3062f2499), el cual se manifiesta cuando una (o varias) de las clases es muy baja en proporción respecto a la otra(s). Existen técnicas para balancear la clases, pero estas están fuera del alcance de este capítulo.
@@ -579,7 +574,7 @@ En efecto, considere un problema de regresión con variable respuesta continua $
 <br>
 <center>
 
-![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2024-10/images/Figura_2_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.png "")
+![](C:/mii/Data_Science_2025-10/images/Figura_2_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.png "")
 
 </center>
 <br>
@@ -624,12 +619,10 @@ y la idea es predecir las millas por galón (`mpg`) que promediará un automóvi
 Suponga que luego de generar el análisis, el árbol de decisión es el que se muestra en la siguiente figura.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
-library(rpart)
-library(rpart.plot)
-m1 <- rpart(formula = mpg ~.,
-            data = cars_df,
-            method = "anova")
-rpart.plot(m1)
+m1 <- rpart::rpart(formula = mpg ~.,
+                   data = cars_df,
+                   method = "anova")
+rpart.plot::rpart.plot(m1)
 ```
 
 Entender e interpretar un árbol de decisión es muy sencillo. En efecto, todas las observaciones pasan por el árbol, se evalúan en un nodo en particular y van hacia la izquierda si la respuesta asociada al nodo es "sí" o hacia la derecha si la respuesta es "no". 
@@ -654,14 +647,15 @@ $$
 Veamos gráficamente los puntos para hacernos una idea de las regiones generadas al particionar el espacio de variables predictoras `cyl` y `hp`. En efecto:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
-ggplot(data = cars_df) + aes(x = cyl, y = hp, color = mpg) +
-  geom_point(size = 3, alpha = 0.8) + 
-  geom_vline(xintercept =  5, color = "gray", linetype = 2) +
-  geom_segment(x = 5, y = 193, xend = 9, yend = 192, color = "gray", linetype = 2) +
-  annotate(geom = "text", x = 4.5, y = 200, label = "R1", color = "red") +
-  annotate(geom = "text", x = 7, y = 120, label = "R2", color = "blue") +
-  annotate(geom = "text", x = 6.5, y = 250, label = "R3", color = "black") +
-  theme(panel.background = element_rect(fill = "white", colour = "black"))
+ggplot2::ggplot(data = cars_df) +
+  ggplot2::aes(x = cyl, y = hp, color = mpg) +
+  ggplot2::geom_point(size = 3, alpha = 0.8) + 
+  ggplot2::geom_vline(xintercept =  5, color = "gray", linetype = 2) +
+  ggplot2::geom_segment(x = 5, y = 193, xend = 9, yend = 192, color = "gray", linetype = 2) +
+  ggplot2::annotate(geom = "text", x = 4.5, y = 200, label = "R1", color = "red") +
+  ggplot2::annotate(geom = "text", x = 7, y = 120, label = "R2", color = "blue") +
+  ggplot2::annotate(geom = "text", x = 6.5, y = 250, label = "R3", color = "black") +
+  ggplot2::theme(panel.background = ggplot2::element_rect(fill = "white", colour = "black"))
 ```
 
 :::
@@ -715,18 +709,14 @@ Usaremos la librería [`rpart`](https://www.rdocumentation.org/packages/rpart/ve
 Primero, cargaremos las librerías, y leeremos la base de datos `"ames_dataset.csv"`, asignándola al objeto `data_ames`. En efecto:
 
 ```{r message=FALSE, warning=FALSE, paged.print=TRUE}
-library(rsample)
-library(rpart)
-library(rpart.plot)
-
-data_ames <- read.csv("ames_dataset.csv", stringsAsFactors = FALSE)
+data_ames <- utils::read.csv("data/ames_dataset.csv", stringsAsFactors = FALSE)
 data_ames
 ```
 
 Inspeccionamos el dataframe anterior para revisar los tipos de datos y los valores que contienen cada una de las variables.
 
 ```{r}
-str(data_ames)
+utils::str(data_ames)
 ```
 
 Vemos que el dataframe contiene $2930$ observaciones (filas) y $81$ variables (columnas). De estas, `Sale_Price` será la variable respuesta, ya que estamos interesados en predecir el valor de venta de una casa en función de sus características. Se recomienda revisar la descripción de cada una de las variables para entender a que corresponden cada una de ellas. Para esto, instale la librería `AmesHousing` y ejecute el comando `?ames_raw` para que tenga acceso a la documentación completa de la base de datos. 
@@ -735,10 +725,10 @@ Luego, creamos los conjuntos de entrenamiento, `ames_train`, y validación, `aam
 
 ```{r}
 set.seed(123)
-ames_split <- initial_split(data_ames, prop = 0.7)
-ames_train <- training(ames_split)
+ames_split <- rsample::initial_split(data_ames, prop = 0.7)
+ames_train <- rsample::training(ames_split)
 ames_train
-ames_validation <- testing(ames_split)
+ames_validation <- rsample::testing(ames_split)
 ames_validation
 ```
 
@@ -755,9 +745,9 @@ ames_sales_prices <- rbind(ames_train_sales_prices,
                            ames_validation_sales_prices)
 ames_sales_prices
 
-ggplot(data = ames_sales_prices) +
-  aes(x = Sale_Price, color = set) +
-  geom_density()
+ggplot2::ggplot(data = ames_sales_prices) +
+  ggplot2::aes(x = Sale_Price, color = set) +
+  ggplot2::geom_density()
 ```
 
 Vemos que en ambos conjuntos la variable respuesta se distribuye de manera muy similar. ¿Ocurrirá lo mismo con las restantes 80 variables? Veamos solo algunas de ellas (en principio, debiésemos revisar todas, pero eso se lo dejaremos para que lo realice usted!)
@@ -785,34 +775,34 @@ ames_some_predictors
 
 ames_some_predictors_numerics <- ames_some_predictors[, c("set", "First_Flr_SF", "Gr_Liv_Area", "Total_Bsmt_SF")]
 
-ggplot(data = ames_some_predictors_numerics) +
-  aes(x = First_Flr_SF, color = set) +
-  geom_density()
+ggplot2::ggplot(data = ames_some_predictors_numerics) +
+  ggplot2::aes(x = First_Flr_SF, color = set) +
+  ggplot2::geom_density()
 
-ggplot(data = ames_some_predictors_numerics) +
-  aes(x = Gr_Liv_Area, color = set) +
-  geom_density()
+ggplot2::ggplot(data = ames_some_predictors_numerics) +
+  ggplot2::aes(x = Gr_Liv_Area, color = set) +
+  ggplot2::geom_density()
 
-ggplot(data = ames_some_predictors_numerics) +
-  aes(x = Total_Bsmt_SF, color = set) +
-  geom_density()
+ggplot2::ggplot(data = ames_some_predictors_numerics) +
+  ggplot2::aes(x = Total_Bsmt_SF, color = set) +
+  ggplot2::geom_density()
 
 ames_some_predictors_categorical <- ames_some_predictors[, c("set", "Overall_Qual", "Neighborhood", "Utilities")]
 
-ggplot(data = ames_some_predictors_categorical) +
-  aes(x = Overall_Qual, fill = set) +
-  geom_bar(position = "dodge2") +
-  coord_flip()
+ggplot2::ggplot(data = ames_some_predictors_categorical) +
+  ggplot2::aes(x = Overall_Qual, fill = set) +
+  ggplot2::geom_bar(position = "dodge2") +
+  ggplot2::coord_flip()
 
-ggplot(data = ames_some_predictors_categorical) +
-  aes(x = Neighborhood, fill = set) +
-  geom_bar(position = "dodge2") +
-  coord_flip()
+ggplot2::ggplot(data = ames_some_predictors_categorical) +
+  ggplot2::aes(x = Neighborhood, fill = set) +
+  ggplot2::geom_bar(position = "dodge2") +
+  ggplot2::coord_flip()
 
-ggplot(data = ames_some_predictors_categorical) +
-  aes(x = Utilities, fill = set) +
-  geom_bar(position = "dodge2") +
-  coord_flip()
+ggplot2::ggplot(data = ames_some_predictors_categorical) +
+  ggplot2::aes(x = Utilities, fill = set) +
+  ggplot2::geom_bar(position = "dodge2") +
+  ggplot2::coord_flip()
 ```
 
 De las gráficas anteriores se aprecia que las variables numéricas conservan su perfil (al menos las que analizamos), sin embargo, para las variables categóricas este patrón no ocurre.
@@ -820,9 +810,9 @@ De las gráficas anteriores se aprecia que las variables numéricas conservan su
 Luego de este breve análisis exploratorio, entrenaremos el modelo de árbol de regresión. Para esto, usamos el siguiente código:
 
 ```{r message=FALSE, warning=FALSE, paged.print=TRUE}
-dt_model_1 <- rpart(formula = Sale_Price ~.,
-                    data = ames_train,
-                    method = "anova")
+dt_model_1 <- rpart::rpart(formula = Sale_Price ~.,
+                           data = ames_train,
+                           method = "anova")
 dt_model_1
 ```
 
@@ -835,7 +825,7 @@ Básicamente, lo anterior nos está diciendo que la variable más importante (qu
 Un análisis similar se puede seguir realizando para entender los siguientes nodos y ramas. Sin embargo, es mucho más fácil entender el árbol a través de una visualización gráfica. En efecto:
 
 ```{r}
-rpart.plot(dt_model_1)
+rpart.plot::rpart.plot(dt_model_1)
 ```
 
 `rpart.plot` tiene muchas opciones para graficar el árbol, que dejaremos para que usted las explore. Sin embargo, en la gráfica por defecto, se muestra el porcentaje de datos que caen en un nodo y el valor promedio de la variable respuesta en esta partición (en este caso, el precio de venta promedio). Tres cosas importantes que se pueden notar son:
@@ -859,7 +849,7 @@ La siguiente figura ilustra algunos ejemplos para entender el funcionamiento de 
 <br>
 <center>
 
-![](C:/Users/maali/OneDrive/SwpDocs/UNAB/Docencia/MachineLearningUNAB/Data_Science_2024-10/images/Figura_3_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.jpg "")
+![](C:/mii/Data_Science_2025-10/images/Figura_3_Capitulo_6_Aprendizaje_Supervisado_Naive_Bayes_Arboles_de_Decision.jpg "")
 
 </center>
 <br>
@@ -893,7 +883,7 @@ Nuevamente, comparamos este valor con el valor de referencia (`cp = 0.01`) y vem
 Es posible revisar una gráfica usando el comando `plotcp(dt_model_1)` que muestra el perfil del error de validación cruzada (eje $y$) en función del del parámetro `cp` (eje $x-inferior$) y del número de nodos terminales (eje $x-superior$) o $\text{tamaño del árbol} = |T|$. Para este ejemplo se tiene:
 
 ```{r}
-plotcp(dt_model_1)
+rpart::plotcp(dt_model_1)
 ```
 
 También puede notar la línea punteada que pasa por el punto $|T| = 8$. Breiman et al. (1984) sugieren otra regla para seleccionar el mejor árbol, llamada **regla 1-SE**, la cual sugiere elegir un árbol más pequeño (menos complejo) cuyo error de validación sea a lo más igual al error de validación del árbol obtenido mediante el criterio de complejidad más una desviación estándar de ese error. En efecto, si volvemos a la tabla de valores `cp` de nuestro árbol, vemos que `xerror = 0.2635207` y `xstd = 0.01881691`, por lo tanto el árbol que elegiríamos según esta regla sería aquel con $\text{xerror} \leq 0.2635207 + 1 * 0.01881691 = 0.2823376$, es decir, el árbol con `nsplit = 7` o equivalentemente, con 8 nodos terminales.
@@ -902,14 +892,14 @@ También puede notar la línea punteada que pasa por el punto $|T| = 8$. Breiman
 Para ilustrar el punto anterior es posible forzar a `rpart` para que genere un árbol completo. Para esto, usamos `cp = 0` (sin penalización) dentro del argumento auxiliar `control`. En efecto: 
 
 ```{r}
-dt_model_complete <- rpart(formula = Sale_Price ~ .,
-                           data    = ames_train,
-                           method  = "anova", 
-                           control = list(cp = 0, xval = 10))
+dt_model_complete <- rpart::rpart(formula = Sale_Price ~ .,
+                                  data    = ames_train,
+                                  method  = "anova", 
+                                  control = list(cp = 0, xval = 10))
 
-rpart.plot(dt_model_complete)
-plotcp(dt_model_complete)
-abline(v = 13, lty = "dashed")
+rpart.plot::rpart.plot(dt_model_complete)
+rpart::plotcp(dt_model_complete)
+graphics::abline(v = 13, lty = "dashed")
 ```
 
 De la ultima gráfica se observa que después de $13$ nodos terminales la tasa de disminución del error es cada vez más pequeña a medida que el árbol crece. Por lo tanto, podemos podar el árbol y dejarlo con $13$ nodos terminales sin sacrificar significativamente su performance. 
@@ -920,15 +910,15 @@ Podemos concluir entonces que, de manera predeterminada, `rpart` realiza algunos
 `rpart` usa un argumento de control especial donde proporcionamos una lista de valores de hiperparámetros. Por ejemplo, si quisiéramos evaluar un modelo con `minsplit = 10` y `maxdepth = 3`, podríamos ejecutar lo siguiente:
 
 ```{r}
-dt_model_2 <- rpart(formula = Sale_Price ~ .,
-                    data    = ames_train,
-                    method  = "anova", 
-                    control = list(minsplit = 10, 
-                                   maxdepth = 3, 
-                                   xval = 10))
+dt_model_2 <- rpart::rpart(formula = Sale_Price ~ .,
+                           data    = ames_train,
+                           method  = "anova", 
+                           control = list(minsplit = 10, 
+                                          maxdepth = 3, 
+                                          xval = 10))
 
-rpart.plot(dt_model_2)
-plotcp(dt_model_2)
+rpart.plot::rpart.plot(dt_model_2)
+rpart::plotcp(dt_model_2)
 dt_model_2$cptable
 ```
 
@@ -958,14 +948,14 @@ for (i in 1:nrow(hyper_grid)) {
   minsplit <- hyper_grid$minsplit[i]
   maxdepth <- hyper_grid$maxdepth[i]
   cp <- hyper_grid$cp[i]
-
+  
   # Entrenamos un modelo y lo guardamos en la lista creada
-  models[[i]] <- rpart(formula = Sale_Price ~ .,
-                       data    = ames_train,
-                       method  = "anova",
-                       control = list(minsplit = minsplit, 
-                                      maxdepth = maxdepth, 
-                                      cp       = cp))
+  models[[i]] <- rpart::rpart(formula = Sale_Price ~ .,
+                              data    = ames_train,
+                              method  = "anova",
+                              control = list(minsplit = minsplit, 
+                                             maxdepth = maxdepth, 
+                                             cp       = cp))
 }
 ```
 
@@ -1023,14 +1013,14 @@ Vemos entonces que el mejor árbol será aquel con `minsplit = 12`, `maxdepth = 
 Si aceptamos este como modelo final, entrenamos un árbol de acuerdo a esos parámetros:
 
 ```{r}
-optimal_dt_model <- rpart(formula = Sale_Price ~ .,
-                          data    = ames_train,
-                          method  = "anova",
-                          control = list(minsplit = 12, 
-                                         maxdepth = 14, 
-                                         cp       = 0.001125284))
+optimal_dt_model <- rpart::rpart(formula = Sale_Price ~ .,
+                                 data    = ames_train,
+                                 method  = "anova",
+                                 control = list(minsplit = 12, 
+                                                maxdepth = 14, 
+                                                cp       = 0.001125284))
 
-rpart.plot(optimal_dt_model)
+rpart.plot::rpart.plot(optimal_dt_model)
 ```
 
 Finalmente, usamos el modelo anterior para realizar predicciones sobre el conjunto de datos de validación para ver que tan bueno es usando datos nuevos. Esto se ejecuta mediante la función `predict(modelo, newdata = validation_data)`. Antes si, hay que agregar los niveles faltantes a aquellas variables categóricas del conjunto de validación (¿se acuerda cuando hicimos el análisis exploratorio y vimos que habían diferencias para algunas variables categóricas cuando comparamos el conjunto de entrenamiento con el de validación?) Mediremos el desempeño final sobre los datos usando la métrica [RMSE](https://en.wikipedia.org/wiki/Root-mean-square_deviation). En efecto:
@@ -1080,13 +1070,19 @@ ames_validation$Mas_Vnr_Type <- factor(ames_validation$Mas_Vnr_Type,
 ames_validation$Electrical <- factor(ames_validation$Electrical, 
                                      levels = levels(ames_train$Electrical))
 
+ames_validation$Sale_Type <- factor(ames_validation$Sale_Type, 
+                                    levels = levels(ames_train$Sale_Type))
+
+ames_validation$Pool_QC <- factor(ames_validation$Pool_QC, 
+                                  levels = levels(ames_train$Pool_QC))
+
 # Usamos el modelo final para predecir sobre los datos de validación
-pred <- predict(optimal_dt_model, 
-                newdata = ames_validation)
+pred <- stats::predict(optimal_dt_model, 
+                       newdata = ames_validation)
 
 # Calculamos el root mean squared error (RMSE) para medir la performance del modelo
-RMSE(pred = pred, 
-     obs = ames_validation$Sale_Price)
+caret::RMSE(pred = pred, 
+            obs = ames_validation$Sale_Price)
 ```
 
 De acuerdo con el valor anterior, podemos concluir que nuestro modelo final predice el precio de una casa con un error promedio de $\$34566.8$ dólares. Nada mal si tomamos en cuenta que el valor promedio de venta de las casas en el conjunto de validación es de $\$180844$. 
@@ -1098,9 +1094,11 @@ Sale_Prices_df <- data.frame(Real_Sale_Price = ames_validation$Sale_Price,
                              Predicted_Sale_Price = pred)
 Sale_Prices_df
 
-ggplot(data = Sale_Prices_df) + 
-  aes(x = Predicted_Sale_Price, y = Real_Sale_Price) + 
-  geom_point()
+ggplot2::ggplot(data = Sale_Prices_df) + 
+  ggplot2::aes(x = Predicted_Sale_Price, y = Real_Sale_Price) + 
+  ggplot2::geom_point()
 ```
 
 Del gráfico se observa que para valores menores del precio de venta la dispersión en la predicción es menor. Además, se ve claramente que el modelo predice valores promedio, por eso se ve como si el eje $x$ fuera discreto (hay tantas franjas verticales como nodos finales tiene el árbol!)
+
+</div>
